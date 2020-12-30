@@ -1,0 +1,27 @@
+PKG="expect"
+VER="5.45.4"
+HOMEPAGE="https://core.tcl.tk/expect/"
+URL="https://prdownloads.sourceforge.net/$PKG/$PKG$VER.tar.gz"
+MD5="00fce8de158422f5ccd2666512329bd2"
+SBU="0.2"
+
+__configure() {
+  conf_opts="$conf_opts --with-tcl=/usr/lib     \
+                        --enable-shared         \
+                        --mandir=/usr/share/man \
+                        --with-tclinclude=/usr/include"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install
+  ln -sf expect5.45.4/libexpect5.45.4.so /usr/lib
+}

@@ -1,0 +1,25 @@
+PKG="bash"
+VER="5.0"
+HOMEPAGE="http://www.gnu.org/software/bash/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="2b44b47b905be16f45709648f671820b"
+SBU="0.4"
+
+__configure() {
+  conf_opts="--prefix=/usr                   \
+             --build=$(support/config.guess) \
+             --host=$LFS_TGT                 \
+             --without-bash-malloc"
+  src_configure || exit $?
+}
+
+__make() {
+  src_make || exit $?
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install || exit $?
+  mv $LFS/usr/bin/bash $LFS/bin/bash
+  ln -sf bash $LFS/bin/sh
+}

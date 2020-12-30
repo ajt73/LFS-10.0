@@ -1,0 +1,27 @@
+PKG="perl"
+VER="5.32.0"
+HOMEPAGE="https://www.perl.org/"
+URL="https://www.cpan.org/src/5.0/$PKG-$VER.tar.xz"
+MD5="3812cd9a096a72cb27767c7e2e40441c"
+SBU="1.8"
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  sh Configure -des                                        \
+               -Dprefix=/usr                               \
+               -Dvendorprefix=/usr                         \
+               -Dprivlib=/usr/lib/perl5/5.32/core_perl     \
+               -Darchlib=/usr/lib/perl5/5.32/core_perl     \
+               -Dsitelib=/usr/lib/perl5/5.32/site_perl     \
+               -Dsitearch=/usr/lib/perl5/5.32/site_perl    \
+               -Dvendorlib=/usr/lib/perl5/5.32/vendor_perl \
+               -Dvendorarch=/usr/lib/perl5/5.32/vendor_perl >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+}

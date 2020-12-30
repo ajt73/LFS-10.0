@@ -1,0 +1,45 @@
+PKG=""
+VER=""
+HOMEPAGE=""
+URL=""
+MD5=""
+SBU=""
+
+__prepare() {
+:
+}
+
+__configure() {
+  # conf_opts=""
+  # src_configure
+  #
+  # (custom)
+  # echo "Configuring $GREEN$PKG-$VER $DEFAULT"
+  # [configure] >> ${logdir}/${PKG}-${VER} 2>&1
+  :
+}
+
+__make() {
+  # make_opts=""
+  # src_make
+  #
+  # (custom)
+  # echo "Compiling $GREEN$PKG-$VER $DEFAULT"
+  # [compile] >> ${logdir}/${PKG}-${VER} 2>&1
+  :
+}
+
+__test() {
+  # src_test
+:
+}
+
+__install() {
+  # inst_opts=""
+  # src_install || exit $?
+  #
+  # (custom)
+  # echo "Installing $GREEN$PKG-$VER $DEFAULT"
+  # [install] >> ${logdir}/${PKG}-${VER} 2>&1
+  :
+}

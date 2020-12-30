@@ -1,0 +1,23 @@
+PKG="make"
+VER="4.3"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="fc7a67ea86ace13195b0bce683fd4469"
+SBU="0.1"
+
+__configure() {
+  conf_opts="--prefix=/usr   \
+             --without-guile \
+             --host=$LFS_TGT \
+             --build=$(build-aux/config.guess)"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}

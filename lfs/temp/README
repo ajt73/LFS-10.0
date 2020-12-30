@@ -1,0 +1,13 @@
+Buildfiles to install the initial build environment
+
+cross-* : Cross-Toolchain (See Chapter 5)
+temp-*  : Temporary tools (See Chapter 6)
+
+lfs.chroot : Sets up the chroot to all installation of LFS proper
+lfs.config : Default configuration file
+lfs.stage1 : Setup environment, and install the cross-* and temp-* tools
+lfs.stage2 : Additional temporary tools that must be built under chroot
+stage1.lfsbuild : Meta package with list of required build scripts
+stage2.lfsbuild : Meta package with list of required build scripts
+
+template.lfsbuild : Template for lfs build scripts

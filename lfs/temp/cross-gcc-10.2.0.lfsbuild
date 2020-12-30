@@ -1,0 +1,62 @@
+PKG="gcc"
+VER="10.2.0"
+HOMEPAGE="https://gcc.gnu.org/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER/$PKG-$VER.tar.xz"
+MD5="e9fd9b1789155ad09bcf3ae747596b50"
+REQUIRE=("cross-mpfr-4.1.0" "cross-gmp-6.2.0" "cross-mpc-1.1.0")
+SBU="11"
+
+__prepare() {
+  tar -xf ../mpfr-4.1.0.tar.xz
+  mv mpfr-4.1.0 mpfr
+  tar -xf ../gmp-6.2.0.tar.xz
+  mv gmp-6.2.0 gmp
+  tar -xf ../mpc-1.1.0.tar.gz
+  mv mpc-1.1.0 mpc
+  
+  case $(uname -m) in
+  x86_64)
+    sed -e '/m64=/s/lib64/lib/' \
+        -i.orig gcc/config/i386/t-linux64
+    ;;
+  esac
+  
+  mkdir build
+  cd build
+}
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  ../configure                                     \
+    --target=$LFS_TGT                              \
+    --prefix=$LFS/tools                            \
+    --with-glibc-version=2.11                      \
+    --with-sysroot=$LFS                            \
+    --with-newlib                                  \
+    --without-headers                              \
+    --enable-initfini-array                        \
+    --disable-nls                                  \
+    --disable-shared                               \
+    --disable-multilib                             \
+    --disable-decimal-float                        \
+    --disable-threads                              \
+    --disable-libatomic                            \
+    --disable-libgomp                              \
+    --disable-libquadmath                          \
+    --disable-libssp                               \
+    --disable-libvtv                               \
+    --disable-libstdcxx                            \
+    --enable-languages=c,c++ >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+}
+
+__make() {
+  MAKEFLAGS="-j1"
+  src_make || exit $?
+}
+
+__install() {
+  src_install || exit $?
+  cd ..
+  cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
+  $(dirname $($LFS_TGT-gcc -print-libgcc-file-name))/install-tools/include/limits.h
+}

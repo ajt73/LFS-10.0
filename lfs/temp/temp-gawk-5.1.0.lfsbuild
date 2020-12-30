@@ -1,0 +1,26 @@
+PKG="gawk"
+VER="5.1.0"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="8470c34eeecc41c1aa0c5d89e630df50"
+SBU="0.2"
+
+__prepare() {
+  sed -i 's/extras//' Makefile.in
+}
+
+__configure() {
+  conf_opts="--prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(./config.guess)"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}

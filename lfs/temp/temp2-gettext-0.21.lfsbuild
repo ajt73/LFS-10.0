@@ -1,0 +1,20 @@
+PKG="gettext"
+VER="0.21"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="40996bbaf7d1356d3c22e33a8b255b31"
+SBU="1.9"
+
+__configure() {
+  conf_opts="--disable-shared"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
+  cp gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin
+}

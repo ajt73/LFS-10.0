@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+# © Anthony Taylor 2020
+#
+# LFS initial setup
+# 
+# Derived from Linux From Scratch, revision 10.0
+# http://www.linuxfromscratch.org/lfs/
+#
+# Version 0.1
+
+echo "Linux From Scratch installation script"
+echo "Version 10.0"
+
+if [ $UID -eq 0 ]; then
+  echo "Error: Must not be root"
+  exit 1
+fi
+
+export LFS=/mnt/lfs
+bootpart=/dev/sda1
+rootpart=/dev/sda3
+homepart=/dev/sda4
+progress=$LFS/etc/lfs/lfs.progress
+
+read -sp "Enter password for $(id -un): " ADMINPWD
+echo
+
+# Initial preparations
+# See Chapter 4
+if [[ ! $(mount | grep "${rootpart} on ${LFS}") ]]; then
+  echo ${ADMINPWD}|sudo mkdir -p $LFS
+  echo ${ADMINPWD}|sudo mount ${rootpart} ${LFS}
+fi
+
+if [[ ! -f ${progress} ]]; then
+  echo ${ADMINPWD}|sudo mkdir -p $LFS/etc/lfs
+  echo ${ADMINPWD}|sudo sudo bash -c "{ echo -e 'Stage 1 :\nStage 2 :\nSystem  :'; } > ${progress}"
+fi
+
+pushd lfs/temp >/dev/null
+
+# Check where we are in the build progress
+if [[ -f $LFS/etc/lfs-release ]]; then
+  echo "Linux From Scratch base system is already installed"
+  exit 0
+fi
+
+# Stage 1
+if [[ $(grep -c "Stage 1 : Complete" ${progress}) -eq 0 ]]; then
+  echo ${ADMINPWD}|sudo chown -R $(id -un):$(id -un) $LFS 2>/dev/null
+  if [ -e /etc/bash.bashrc ]; then
+    echo ${ADMINPWD}|sudo mv /etc/bash.bashrc /etc/bash.bashrc.NOUSE
+  fi
+  ./lfs.stage1 $ADMINPWD
+  echo ${ADMINPWD}|sudo sed -i "s/^Stage 1 :/Stage 1 : Complete/" $LFS/etc/lfs/lfs.progress
+fi
+  
+# Stage 2
+if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
+  echo ${ADMINPWD}|sudo ./lfs.chroot stage2
+  
+  # Cleanup
+  echo ${ADMINPWD}|sudo find $LFS/usr/{lib,libexec} -name \*.la -delete
+  echo ${ADMINPWD}|sudo rm -rf $LFS/usr/share/{info,man,doc}/*
+  echo ${ADMINPWD}|sudo strip --strip-debug $LFS/usr/lib/*        2>/dev/null
+  echo ${ADMINPWD}|sudo strip --strip-unneeded $LFS/usr/{,s}bin/* 2>/dev/null
+  echo ${ADMINPWD}|sudo strip --strip-unneeded $LFS/tools/bin/*   2>/dev/null
+
+  echo ${ADMINPWD}|sudo chown -R root:root $LFS/ 2>/dev/null
+
+  # Backup temporary filesystem
+  echo "Backing up the temporary file system"
+  rm -rf $LFS/.Trash-1000   # Remove Trash folder
+  rm -f "$(dirname $0)/../../lfs-temp-tools-10.0.tar.xz"
+  echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-temp-tools-10.0.tar.xz" $LFS/
+
+  echo ${ADMINPWD}|sudo sed -i "s/^Stage 2 :/Stage 2 : Complete/" $LFS/etc/lfs/lfs.progress
+fi
+
+# Stage 3  
+echo "Stage 3"
+# Reset install log
+rm $LFS/etc/lfs/lfs.install
+touch $LFS/etc/lfs/lfs.install
+echo ${ADMINPWD}|sudo ./lfs.chroot stage3 || exit $?
+
+if [ -f /etc/bash.bashrc.NOUSE ]; then
+  echo ${ADMINPWD}|sudo mv /etc/bash.bashrc.NOUSE /etc/bash.bashrc
+fi
+popd >/dev/null

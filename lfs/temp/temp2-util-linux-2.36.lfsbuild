@@ -1,0 +1,33 @@
+PKG="util-linux"
+VER="2.36"
+HOMEPAGE="http://freecode.com/projects/util-linux"
+URL="https://www.kernel.org/pub/linux/utils/$PKG/v$VER/$PKG-$VER.tar.xz"
+MD5="fe7c0f7e439f08970e462c9d44599903"
+SBU="0.8"
+
+__prepare() {
+  mkdir -p /var/lib/hwclock
+}
+
+__configure() {
+  conf_opts="ADJTIME_PATH=/var/lib/hwclock/adjtime    \
+              --docdir=/usr/share/doc/util-linux-2.36 \
+              --disable-chfn-chsh  \
+              --disable-login      \
+              --disable-nologin    \
+              --disable-su         \
+              --disable-setpriv    \
+              --disable-runuser    \
+              --disable-pylibmount \
+              --disable-static     \
+              --without-python"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+}

@@ -1,0 +1,21 @@
+PKG="gzip"
+VER="1.10"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="691b1221694c3394f1c537df4eee39d3"
+SBU="0.2"
+
+__configure() {
+  conf_opts="--prefix=/usr --host=$LFS_TGT"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+  mv $LFS/usr/bin/gzip $LFS/bin
+}

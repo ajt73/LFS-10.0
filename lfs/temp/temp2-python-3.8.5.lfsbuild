@@ -1,0 +1,21 @@
+PKG="Python"
+VER="3.8.5"
+HOMEPAGE="https://www.python.org/"
+URL="https://www.python.org/ftp/python/$VER/$PKG-$VER.tar.xz"
+MD5="35b5a3d0254c1c59be9736373d429db7"
+SBU="1.2"
+
+__configure() {
+  conf_opts="--prefix=/usr   \
+            --enable-shared  \
+            --without-ensurepip"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+}

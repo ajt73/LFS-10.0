@@ -1,0 +1,214 @@
+#!/bin/bash
+#
+# © Anthony Taylor 2020
+#
+# Linux From Scratch (LFS)
+# Installation Tool and Package Manager
+# Based on Version 10
+# Linux From Scratch is Copyright © 1999-2020, Gerard Beekmans
+# http://www.linuxfromscratch.org/
+#
+#set -x
+set -eo pipefail
+
+version=0.1
+
+setup() {
+  # Stage?? buildscripts are used during the initial installation of LFS
+  # The LFS variable must be set
+  case ${1} in
+    stage1*|cross-*|temp-*)
+      LFS=/mnt/lfs
+      usr=${LFS}/usr
+      etc=${LFS}/etc
+      var=${LFS}/var
+      ;;
+    *)
+      usr=/usr
+      etc=/etc
+      var=/var
+      ;;
+  esac
+  
+  srcdir=${usr}/src
+  buildscripts=${srcdir}/buildscripts
+  logdir=${var}/log/lfs
+  lfsconfig=${etc}/lfs/lfs.config
+  install_log=${etc}/lfs/lfs.install
+  if [[ -f ${lfsconfig} ]]; then
+    source ${lfsconfig}
+    SBUref=$(grep SBU= ${lfsconfig})
+    SBUref=${SBUref#*=}
+  fi
+  checkbuildfile "${1}"
+}
+
+checkbuildfile() {
+  buildfile=$(find ${buildscripts} -type f -name "${1}*" | sort -V | tail -n 1)
+  if [ -f "${buildfile:-}" ]; then
+    if [ $(grep -c ${1} ${install_log}) -gt 0 ]; then
+      echo "${1} already installed"
+      exit 0
+    else
+      source ${buildfile}
+    fi
+  else
+    echo "Error: Buildfile ${1} not found"
+    exit 1
+  fi
+}
+
+src_fetch() {
+  if [[ ! -f ${srcdir}/${tarball} ]]; then
+    printf "Downloading $GREEN$tarball $DEFAULT\n"
+    wget -q ${URL}
+  fi
+  if [[ -n $MD5 ]]; then
+    md5=$(md5sum ${tarball})
+    if [ ${md5%% *} != ${MD5} ]; then
+      echo "Error: Bad checksum for ${tarball}"
+      exit 1
+    fi
+  fi
+}
+
+src_unpack() {
+#  printf "Unpacking $GREEN$PKG-$VER $DEFAULT\n"
+  # Extract unpacked folder name
+  builddir=$(tar --exclude='*/*' -tvf ${tarball})
+  builddir=${builddir%*/}
+  builddir=${builddir##* }
+  rm -rf ${builddir}
+  tar -xf ${tarball}
+  cd ${builddir}
+}
+
+src_patch() {
+  patchcount=0
+  for srcpatch in ${PATCH[@]}; do
+    srcpatch=${srcpatch##*/}
+    if [[ ! -f ${srcdir}/${srcpatch} ]]; then
+      printf "Downloading $GREEN$srcpatch $DEFAULT\n"
+      wget -q ${srcpatch}
+    fi
+    md5=$(md5sum ${srcdir}/${srcpatch})
+    if [ ${md5%% *} != ${PATCHMD5[patchcount]} ]; then
+      echo "Error: Bad checksum for ${srcpatch}"
+      exit 1
+    fi
+    patch -Np1 -i ${srcdir}/${srcpatch} >> ${logdir}/${PKG}-${VER} 2>&1
+    let patchcount++
+  done
+}
+
+src_configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  ./configure ${conf_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+}
+
+src_make() {
+  printf "Compiling $GREEN$PKG-$VER $DEFAULT\n"
+  make ${make_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+}
+
+src_test() {
+  printf "Testing $GREEN$PKG-$VER $DEFAULT\n"
+  make test > ${logdir}/${PKG}-${VER}-test 2>&1
+}
+
+src_install() {
+  printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
+  make install ${inst_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+}
+
+pkg_install() {
+:
+}
+
+__help() {
+  echo "Linux From Scratch"
+  echo
+  echo "Options"
+  echo "-b {pkg} : Build package without installing it"
+  echo "-d {pkg} : Download package tarball"
+  echo "-h       : Show help (this page)"
+  echo "-s       : Synchronise the local buildfiles with the master buildfiles"
+  echo "-v       : Show the version number"
+  echo "{pkg}    : Build and install package"
+}
+
+##############
+#            #
+# Start Here #
+#            #
+##############
+
+case "${1}" in
+  ""|-h)  # Help
+    __help
+  ;;
+  -d)     # Download tarball
+    setup ${1}
+    if [[ ${URL} != "" ]]; then
+      src_fetch
+    else
+      echo "Nothing to download"
+    fi
+  ;;
+  -s)     # Synchronise
+    MASTER="/media/user/011b7a68-5f77-4744-8a84-9023eea502ad/lfs-10"
+    LFS=/mnt/lfs
+    cp -rup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
+    mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/  
+  ;;
+  -v)     # Version
+    echo "$version"
+  ;;
+  *)      # Build and install
+    setup ${1}
+    if [[ ${SBU} != "" ]]; then
+      P=${buildfile##*/}
+      P=${P%.*}
+      printf "Building $GREEN${P} $DEFAULT\n"
+      # Check for bc to allow calculation of build time
+      if [[ $(bc -v 2>/dev/null) ]]; then
+        buildsec=00$(bc <<< "scale=0;${SBUref}*${SBU}%60/1")
+        buildmin=00$(bc <<< ${SBUref}*${SBU}/60)
+        buildtime="${buildmin:(-2)}:${buildsec:(-2)}"
+        printf "Estimated Build Time: $CYAN${buildtime} $DEFAULT\n"
+      fi
+    fi
+    if [ -n REQUIRE ]; then
+    # Resolve dependancies
+      for dep in ${REQUIRE[@]}; do
+        lfsbuild ${dep}
+      done
+    fi
+    if [[ -n ${PKG} ]]; then  # meta packages do not define PKG
+      pushd ${srcdir} > /dev/null
+      tarball=${URL##*/}
+      buildlog=${logdir}/${PKG}-${VER}
+      if [ -f ${buildlog} ]; then rm ${buildlog}; fi
+      date > ${buildlog}     # Log the long date
+      date +%s >> ${buildlog} # Log the date as seconds
+      if [[ ${URL} != "" ]]; then src_fetch; fi
+      if [[ ${tarball} != "" ]]; then src_unpack; fi
+      if [[ $(declare -F __prepare) ]]; then __prepare; fi
+      if [[ $(declare -F __configure) ]]; then __configure; fi
+      if [[ $(declare -F __make) ]]; then __make; fi
+      if [[ $(declare -F __test) ]]; then __test; fi
+      if [[ $(declare -F __install) ]]; then
+        installdir="$(pwd)/fakeinstall"
+        if [[ -d ${installdir} ]]; then rm -rf ${installdir}; fi
+        mkdir ${installdir}
+#        inst_opts="DESTDIR=$installdir"
+        __install
+        pkg_install
+      fi
+      echo $(($(date +%s)-$(awk NR==2 ${buildlog}))) >> ${buildlog}
+      popd > /dev/null
+      rm -rf ${srcdir}/${builddir}
+    fi
+    echo "${1} : $(date +'%d %B %Y')" >> ${install_log}
+  ;;
+esac

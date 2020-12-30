@@ -1,0 +1,23 @@
+PKG="tar"
+VER="1.32"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="83e38700a80a26e30b2df054e69956e5"
+SBU="0.2"
+
+__configure() {
+  conf_opts="--prefix=/usr                     \
+             --host=$LFS_TGT                   \
+             --build=$(build-aux/config.guess) \
+             --bindir=/bin"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}

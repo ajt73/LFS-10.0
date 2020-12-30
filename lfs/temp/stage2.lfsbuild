@@ -1,0 +1,8 @@
+SBU="7.1"
+REQUIRE=("temp2-libstdc++-10.2.0"
+         "temp2-gettext-0.21"
+         "temp2-bison-3.7.1"
+         "temp2-perl-5.32.0"
+         "temp2-python-3.8.5"
+         "temp2-texinfo-6.7"
+         "temp2-util-linux-2.36")

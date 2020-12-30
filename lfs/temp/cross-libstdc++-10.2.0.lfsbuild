@@ -1,0 +1,32 @@
+PKG="libstdc++"
+VER="10.2.0"
+HOMEPAGE="https://gcc.gnu.org/"
+URL="http://ftp.gnu.org/gnu/gcc/gcc-$VER/gcc-$VER.tar.xz"
+MD5="e9fd9b1789155ad09bcf3ae747596b50"
+SBU="0.5"
+
+__prepare() {
+  mkdir build
+  cd build
+}
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  ../libstdc++-v3/configure                                   \
+    --host=$LFS_TGT                                           \
+    --build=$(../config.guess)                                \
+    --prefix=/usr                                             \
+    --disable-multilib                                        \
+    --disable-nls                                             \
+    --disable-libstdcxx-pch                                   \
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/10.2.0 >> ${buildlog} 2>&1 || exit $?
+}
+
+__make() {
+  src_make || exit $?
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install || exit $?
+}

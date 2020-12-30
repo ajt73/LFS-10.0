@@ -1,0 +1,19 @@
+PKG="texinfo"
+VER="6.7"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="d4c5d8cc84438c5993ec5163a59522a6"
+SBU="0.3"
+
+__configure() {
+  conf_opts="--prefix=/usr"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+}

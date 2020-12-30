@@ -1,0 +1,20 @@
+PKG="diffutils"
+VER="3.7"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="4824adc0e95dbbf11dfbdfaad6a1e461"
+SBU="0.2"
+
+__configure() {
+  conf_opts="--prefix=/usr --host=$LFS_TGT"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}

@@ -1,0 +1,59 @@
+PKG="tcl"
+VER="8.6.10"
+HOMEPAGE="http://tcl.sourceforge.net/"
+URL="https://downloads.sourceforge.net/$PKG/$PKG$VER-src.tar.gz"
+MD5="97c55573f8520bcab74e21bfd8d0aadc"
+SBU="4.0"
+
+__prepare() {
+  # tcl documentation
+  pushd .. >/dev/null
+  tarball="$PKG$VER-html.tar.gz"
+  URL="https://downloads.sourceforge.net/$PKG/$tarball"
+  MD5="a012711241ba3a5bd4a04e833001d489"
+  src_fetch
+  popd >/dev/null
+  tar xf ../${tarball} --strip-components=1
+}
+
+__configure() {
+  SRCDIR=$(pwd)
+  cd unix
+  conf_opts="${conf_opts} --mandir=/usr/share/man"
+  if [ $(uname -m) = x86_64 ]; then 
+    conf_opts="${conf_opts} --enable-64bit"
+  fi
+  src_configure
+}
+
+__make() {
+  src_make || exit $?
+
+  sed -e "s|$SRCDIR/unix|/usr/lib|" \
+      -e "s|$SRCDIR|/usr/include|"  \
+      -i tclConfig.sh
+
+  sed -e "s|$SRCDIR/unix/pkgs/tdbc1.1.1|/usr/lib/tdbc1.1.1|" \
+      -e "s|$SRCDIR/pkgs/tdbc1.1.1/generic|/usr/include|"    \
+      -e "s|$SRCDIR/pkgs/tdbc1.1.1/library|/usr/lib/tcl8.6|" \
+      -e "s|$SRCDIR/pkgs/tdbc1.1.1|/usr/include|"            \
+      -i pkgs/tdbc1.1.1/tdbcConfig.sh
+
+  sed -e "s|$SRCDIR/unix/pkgs/itcl4.2.0|/usr/lib/itcl4.2.0|" \
+      -e "s|$SRCDIR/pkgs/itcl4.2.0/generic|/usr/include|"    \
+      -e "s|$SRCDIR/pkgs/itcl4.2.0|/usr/include|"            \
+      -i pkgs/itcl4.2.0/itclConfig.sh
+
+  unset SRCDIR
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install || exit $?
+  chmod u+w /usr/lib/libtcl8.6.so
+  make install-private-headers >> ${logdir}/${PKG}-${VER} 2>&1
+  ln -sf tclsh8.6 /usr/bin/tclsh
+}

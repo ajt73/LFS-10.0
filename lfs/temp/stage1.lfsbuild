@@ -1,0 +1,27 @@
+SBU="34"
+REQUIRE=("cross-binutils-2.35"
+         "cross-gcc-10.2.0"
+         "cross-linux-API-5.8.3"
+         "cross-glibc-2.32"
+         "cross-libstdc++-10.2.0"
+         "temp-m4-1.4"
+         "temp-ncurses-6.2"
+         "temp-bash-5.0"
+         "temp-coreutils-8.32"
+         "temp-diffutils-3.7"
+         "temp-file-5.39"
+         "temp-findutils-4.7.0"
+         "temp-gawk-5.1.0"
+         "temp-grep-3.4"
+         "temp-gzip-1.10"
+         "temp-make-4.3"
+         "temp-patch-2.7.6"
+         "temp-sed-4.8"
+         "temp-tar-1.32"
+         "temp-xz-5.2.5"
+         "temp-binutils-2.35"
+         "temp-gcc-10.2.0"
+         "temp-bc-3.1.5")
+
+# Additional packages:
+# bc : Will be over-written with final version in Stage 3

@@ -1,0 +1,24 @@
+PKG="findutils"
+VER="4.7.0"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="731356dec4b1109b812fecfddfead6b2"
+SBU="0.2"
+
+__configure() {
+  conf_opts="--prefix=/usr   \
+            --host=$LFS_TGT \
+            --build=$(build-aux/config.guess)"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+  mv $LFS/usr/bin/find $LFS/bin
+  sed -i 's|find:=${BINDIR}|find:=/bin|' $LFS/usr/bin/updatedb
+}

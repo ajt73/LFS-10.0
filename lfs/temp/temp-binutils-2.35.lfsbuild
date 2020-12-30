@@ -1,0 +1,31 @@
+PKG="binutils"
+VER="2.35"
+HOMEPAGE="http://www.gnu.org/software/binutils/"
+URL="http://ftp.gnu.org/gnu/${PKG}/${PKG}-${VER}.tar.xz"
+MD5="fc8d55e2f6096de8ff8171173b6f5087"
+SBU="1.2"
+
+__prepare() {
+  mkdir build
+  cd build
+}
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  ../configure --prefix=/usr              \
+               --build=$(../config.guess) \
+               --host=$LFS_TGT            \
+               --disable-nls              \
+               --enable-shared            \
+               --disable-werror           \
+               --enable-64-bit-bfd >> ${logdir}/${PKG}-${VER} 2>&1
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}

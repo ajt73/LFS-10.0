@@ -1,0 +1,20 @@
+PKG="bison"
+VER="3.7.1"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="e7c8c321351ebdf70f5f0825f3faaee2"
+SBU="0.3"
+
+__configure() {
+  conf_opts="--prefix=/usr \
+             --docdir=/usr/share/doc/bison-3.7.1"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+}

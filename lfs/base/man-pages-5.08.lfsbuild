@@ -1,0 +1,10 @@
+PKG="man-pages"
+VER="5.08"
+HOMEPAGE="https://www.kernel.org/doc/man-pages/"
+URL="https://www.kernel.org/pub/linux/docs/$PKG/$PKG-$VER.tar.xz"
+MD5="ee4161cbf5ba59be7419937e063252d9"
+SBU="0.1"
+
+__install() {
+  src_install || exit $?
+}

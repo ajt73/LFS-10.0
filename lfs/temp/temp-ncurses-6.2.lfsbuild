@@ -1,0 +1,42 @@
+PKG="ncurses"
+VER="6.2"
+HOMEPAGE="http://www.gnu.org/software/ncurses/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="e812da327b1c2214ac1aed440ea3ae8d"
+SBU="0.7"
+
+__prepare() {
+  sed -i s/mawk// configure
+  mkdir build
+  pushd build > /dev/null
+    ../configure >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+    make -C include >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+    make -C progs tic >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+  popd > /dev/null
+}
+
+__configure() {
+  conf_opts="--prefix=/usr                \
+             --host=$LFS_TGT              \
+             --build=$(./config.guess)    \
+             --mandir=/usr/share/man      \
+             --with-manpage-format=normal \
+             --with-shared                \
+             --without-debug              \
+             --without-ada                \
+             --without-normal             \
+             --enable-widec"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS TIC_PATH=$(pwd)/build/progs/tic"
+  src_install
+  echo "INPUT(-lncursesw)" > $LFS/usr/lib/libncurses.so
+  mv $LFS/usr/lib/libncursesw.so.6* $LFS/lib
+  ln -sf ../../lib/$(readlink $LFS/usr/lib/libncursesw.so) $LFS/usr/lib/libncursesw.so
+}

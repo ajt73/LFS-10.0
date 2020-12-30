@@ -1,0 +1,22 @@
+PKG="grep"
+VER="3.4"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
+MD5="111b117d22d6a7d049d6ae7505e9c4d2"
+SBU="0.2"
+
+__configure() {
+  conf_opts="--prefix=/usr   \
+            --host=$LFS_TGT \
+            --bindir=/bin"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}
