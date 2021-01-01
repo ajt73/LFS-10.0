@@ -1,17 +1,17 @@
 #!/bin/bash
 #
-# © Anthony Taylor 2020
+# © Anthony Taylor 2020-21
 #
 # Linux From Scratch (LFS)
 # Installation Tool and Package Manager
 # Based on Version 10
-# Linux From Scratch is Copyright © 1999-2020, Gerard Beekmans
+# Linux From Scratch is Copyright © 1999-2021, Gerard Beekmans
 # http://www.linuxfromscratch.org/
 #
 #set -x
 set -eo pipefail
 
-version=0.1
+version=0.1.1
 
 setup() {
   # Stage?? buildscripts are used during the initial installation of LFS
@@ -122,7 +122,7 @@ src_install() {
 }
 
 pkg_install() {
-:
+  cp -r ${installdir} /
 }
 
 __help() {
@@ -156,10 +156,11 @@ case "${1}" in
     fi
   ;;
   -s)     # Synchronise
-    MASTER="/media/user/011b7a68-5f77-4744-8a84-9023eea502ad/lfs-10"
+    MASTER="/media/user/011b7a68-5f77-4744-8a84-9023eea502ad/LFS-10.0"
     LFS=/mnt/lfs
     cp -rup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
-    mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/  
+    mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
+    echo "Updated to $($LFS/usr/bin/lfsbuild -v)"  
   ;;
   -v)     # Version
     echo "$version"
@@ -201,7 +202,7 @@ case "${1}" in
         installdir="$(pwd)/fakeinstall"
         if [[ -d ${installdir} ]]; then rm -rf ${installdir}; fi
         mkdir ${installdir}
-#        inst_opts="DESTDIR=$installdir"
+        inst_opts="DESTDIR=$installdir"
         __install
         pkg_install
       fi

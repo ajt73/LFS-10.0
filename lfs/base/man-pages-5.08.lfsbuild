@@ -6,5 +6,5 @@ MD5="ee4161cbf5ba59be7419937e063252d9"
 SBU="0.1"
 
 __install() {
-  src_install || exit $?
+  src_install
 }

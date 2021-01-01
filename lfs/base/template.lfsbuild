@@ -15,7 +15,7 @@ __configure() {
   #
   # (custom)
   # echo "Configuring $GREEN$PKG-$VER $DEFAULT"
-  # [configure] >> ${logdir}/${PKG}-${VER} 2>&1
+  # [configure] >> ${buildlog} 2>&1
   :
 }
 
@@ -25,7 +25,7 @@ __make() {
   #
   # (custom)
   # echo "Compiling $GREEN$PKG-$VER $DEFAULT"
-  # [compile] >> ${logdir}/${PKG}-${VER} 2>&1
+  # [compile] >> ${buildlog} 2>&1
   :
 }
 
@@ -36,10 +36,10 @@ __test() {
 
 __install() {
   # inst_opts=""
-  # src_install || exit $?
+  # src_install
   #
   # (custom)
   # echo "Installing $GREEN$PKG-$VER $DEFAULT"
-  # [install] >> ${logdir}/${PKG}-${VER} 2>&1
+  # [install] >> ${buildlog} 2>&1
   :
 }

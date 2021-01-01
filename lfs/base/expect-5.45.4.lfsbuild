@@ -23,5 +23,5 @@ __test() {
 
 __install() {
   src_install
-  ln -sf expect5.45.4/libexpect5.45.4.so /usr/lib
+  ln -sf expect5.45.4/libexpect5.45.4.so $LFS/usr/lib
 }

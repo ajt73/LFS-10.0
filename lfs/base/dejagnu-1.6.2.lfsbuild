@@ -1,0 +1,18 @@
+PKG="dejagnu"
+VER="1.6.2"
+HOMEPAGE="http://www.gnu.org/software/$PKG/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="e1b07516533f351b3aba3423fafeffd6"
+SBU="0.1"
+
+__configure() {
+  src_configure
+  makeinfo --html --no-split -o doc/dejagnu.html doc/dejagnu.texi
+  makeinfo --plaintext       -o doc/dejagnu.txt  doc/dejagnu.texi
+}
+
+__install() {
+  src_install
+  install -dm755  $LFS/usr/share/doc/$PKG-$VER
+  install -m644   doc/dejagnu.{html,txt} $LFS/usr/share/doc/$PKG-$VER
+}
