@@ -38,9 +38,9 @@ chroot "$LFS" /usr/bin/env -i   \
     PATH=/bin:/usr/bin:/sbin:/usr/sbin \
     /bin/bash --login +h ${chrootscript}
 
-umount $LFS/run    
-umount $LFS/sys
-umount $LFS/proc
+#umount $LFS/run    
+#umount $LFS/sys
+#umount $LFS/proc
 #umount $LFS/dev/pts
 #umount $LFS/dev
 
