@@ -81,9 +81,9 @@ fi
 # Stage 3  
 echo "Stage 3"
 # Reset install log
-rm $LFS/etc/lfs/lfs.install
-touch $LFS/etc/lfs/lfs.install
-echo ${ADMINPWD}|sudo ./lfs.chroot stage3 || exit $?
+echo ${ADMINPWD}|sudo rm $LFS/etc/lfs/lfs.install
+echo ${ADMINPWD}|sudo touch $LFS/etc/lfs/lfs.install
+echo ${ADMINPWD}|sudo ./lfs.chroot stage3
 
 if [ -f /etc/bash.bashrc.NOUSE ]; then
   echo ${ADMINPWD}|sudo mv /etc/bash.bashrc.NOUSE /etc/bash.bashrc
