@@ -41,7 +41,7 @@ chroot "$LFS" /usr/bin/env -i   \
 umount $LFS/run    
 umount $LFS/sys
 umount $LFS/proc
-umount $LFS/dev/pts
-umount $LFS/dev
+#umount $LFS/dev/pts
+#umount $LFS/dev
 
     
