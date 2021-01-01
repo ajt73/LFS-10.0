@@ -13,6 +13,6 @@ __configure() {
 
 __install() {
   src_install
-  install -dm755  $LFS/usr/share/doc/$PKG-$VER
-  install -m644   doc/dejagnu.{html,txt} $LFS/usr/share/doc/$PKG-$VER
+  install -dm755  ${installdir}/usr/share/doc/$PKG-$VER
+  install -m644   doc/dejagnu.{html,txt} ${installdir}/usr/share/doc/$PKG-$VER
 }

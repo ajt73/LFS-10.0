@@ -54,6 +54,6 @@ __test() {
 __install() {
   src_install
   chmod u+w /usr/lib/libtcl8.6.so
-  make install-private-headers ${inst_opts} >> ${logdir}/${PKG}-${VER} 2>&1
-  ln -sf tclsh8.6 $LFS/usr/bin/tclsh
+  make install-private-headers ${inst_opts} >> ${buildlog} 2>&1
+  ln -sf tclsh8.6 ${installdir}/usr/bin/tclsh
 }

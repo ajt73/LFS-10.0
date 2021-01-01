@@ -1,0 +1,11 @@
+PKG="iana-etc"
+VER="20200821"
+HOMEPAGE="https://www.iana.org/protocols"
+URL="https://github.com/Mic92/iana-etc/releases/download/$VER/$PKG-$VER.tar.gz"
+MD5="ff19c45f5ac800f5d77c680d9b757fbc"
+SBU="0.1"
+
+__install() {
+  echo "Installing $GREEN$PKG-$VER $DEFAULT"
+  cp services protocols ${installdir}/etc >> ${buildlog} 2>&1
+}

@@ -40,6 +40,6 @@ __install() {
   #
   # (custom)
   # echo "Installing $GREEN$PKG-$VER $DEFAULT"
-  # [install] >> ${buildlog} 2>&1
+  # [install > ${installdir}] >> ${buildlog} 2>&1
   :
 }
