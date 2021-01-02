@@ -1,0 +1,24 @@
+PKG="zlib"
+VER="1.2.11"
+HOMEPAGE="https://www.zlib.net/"
+URL="https://zlib.net/$PKG-$VER.tar.xz"
+MD5="85adef240c5f370b308da8c938951a68"
+SBU="0.1"
+
+__configure() {
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install
+  mv -v /usr/lib/libz.so.* ${installdir}/lib
+  ln -sfv ../../lib/$(readlink /usr/lib/libz.so) ${installdir}/usr/lib/libz.so
+}

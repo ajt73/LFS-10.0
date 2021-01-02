@@ -1,0 +1,24 @@
+PKG="bc"
+VER="3.1.5"
+HOMEPAGE="https://git.yzena.com/gavin/bc"
+URL="https://github.com/gavinhoward/bc/releases/download/3.1.5/bc-3.1.5.tar.xz"
+MD5="bd6a6693f68c2ac5963127f82507716f"
+SBU="0.1"
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  PREFIX=$LFS/usr CC=gcc CFLAGS="-std=c99" \
+    ./configure.sh -G -O3 >> ${logdir}/${PKG}-${VER} 2>&1
+}
+
+__make() {
+  src_make
+}
+
+__test(){
+  src_test
+}
+
+__install() {
+  src_install
+}

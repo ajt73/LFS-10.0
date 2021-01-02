@@ -1,0 +1,24 @@
+PKG="flex"
+VER="2.6.4"
+HOMEPAGE="https://github.com/westes/flex"
+URL="https://github.com/westes/flex/releases/download/v$VER/$PKG-$VER.tar.gz"
+MD5="2882e3179748cc9f9c23ec593d6adc8d"
+SBU="0.5"
+
+__configure() {
+  conf_opts="$conf_opts --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install
+  ln -sv flex ${installdir}/usr/bin/flex
+}

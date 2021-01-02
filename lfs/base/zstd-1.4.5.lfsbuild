@@ -1,0 +1,17 @@
+PKG="zstd"
+VER="1.4.5"
+HOMEPAGE="https://facebook.github.io/zstd/"
+URL="https://github.com/facebook/zstd/releases/download/v1.4.5/$PKG-$VER.tar.gz"
+MD5="dd0b53631303b8f972dafa6fd34beb0c"
+SBU="0.7"
+
+__make() {
+  src_make
+ }
+
+__install() {
+  src_install
+  rm -v ${installdir}/usr/lib/libzstd.a
+  mv -v /usr/lib/libzstd.so.* ${installdir}/lib
+  ln -sfv ../../lib/$(readlink /usr/lib/libzstd.so) ${installdir}/usr/lib/libzstd.so
+}

@@ -1,0 +1,22 @@
+PKG="file"
+VER="5.39"
+HOMEPAGE="https://www.darwinsys.com/$PKG/"
+URL="ftp://ftp.astron.com/pub/$PKG/$PKG-$VER.tar.gz"
+MD5="1c450306053622803a25647d88f80f25"
+SBU="0.1"
+
+__configure() {
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install
+}

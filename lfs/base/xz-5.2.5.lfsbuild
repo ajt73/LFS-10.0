@@ -1,0 +1,28 @@
+PKG="xz"
+VER="5.2.5"
+HOMEPAGE="https://tukaani.org/xz"
+URL="https://tukaani.org/$PKG/$PKG-$VER.tar.xz"
+MD5="aa1621ec7013a19abab52a8aff04fe5b"
+SBU="0.2"
+
+__configure() {
+  conf_opts="$conf_opts       \
+             --disable-static \
+             --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  src_install
+  mv -v   /usr/bin/{lzma,unlzma,lzcat,xz,unxz,xzcat} /bin
+  mv -v /usr/lib/liblzma.so.* /lib
+  ln -svf ../../lib/$(readlink /usr/lib/liblzma.so) /usr/lib/liblzma.so
+}
