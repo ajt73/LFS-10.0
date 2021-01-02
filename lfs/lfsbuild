@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.1.2
+version=0.1.4
 
 setup() {
   # Stage?? buildscripts are used during the initial installation of LFS
@@ -74,11 +74,11 @@ src_fetch() {
 
 src_unpack() {
 #  printf "Unpacking $GREEN$PKG-$VER $DEFAULT\n"
-  # Extract unpacked folder name
-  builddir=$(tar --exclude='*/*' -tvf ${tarball})
-  builddir=${builddir%*/}
-  builddir=${builddir##* }
+  # Identify the unpacked folder name
+  builddir=$(tar '--exclude=*/*/*' -tf ${tarball} | tail -n 1)
+  builddir=${builddir%%/*}
   rm -rf ${builddir}
+  # Unpack the source 
   tar -xf ${tarball}
   cd ${builddir}
 }

@@ -6,6 +6,7 @@ MD5="ff19c45f5ac800f5d77c680d9b757fbc"
 SBU="0.1"
 
 __install() {
-  echo "Installing $GREEN$PKG-$VER $DEFAULT"
-  cp services protocols ${installdir}/etc >> ${buildlog} 2>&1
+  printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
+  install -dv ${installdir}/etc >> ${buildlog} 2>&1
+  cp -v services protocols ${installdir}/etc >> ${buildlog} 2>&1
 }
