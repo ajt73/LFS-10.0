@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.1.4
+version=0.1.5
 
 setup() {
   # Stage?? buildscripts are used during the initial installation of LFS
@@ -84,7 +84,7 @@ src_unpack() {
 }
 
 src_patch() {
-  patchcount=0
+  p=0
   for srcpatch in ${PATCH[@]}; do
     srcpatch=${srcpatch##*/}
     if [[ ! -f ${srcdir}/${srcpatch} ]]; then
@@ -92,13 +92,14 @@ src_patch() {
       wget -q ${srcpatch}
     fi
     md5=$(md5sum ${srcdir}/${srcpatch})
-    if [ ${md5%% *} != ${PATCHMD5[patchcount]} ]; then
+    if [ ${md5%% *} != ${PATCHMD5[p]} ]; then
       echo "Error: Bad checksum for ${srcpatch}"
       exit 1
     fi
     patch -Np1 -i ${srcdir}/${srcpatch} >> ${logdir}/${PKG}-${VER} 2>&1
-    let patchcount++
+    ((p=p+1))
   done
+  unset p
 }
 
 src_configure() {
@@ -160,7 +161,7 @@ case "${1}" in
     LFS=/mnt/lfs
     cp -rup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
     mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
-    echo "Updated to $($LFS/usr/bin/lfsbuild -v)"  
+    echo "Updated to $($LFS/usr/bin/lfsbuild -v)"
   ;;
   -v)     # Version
     echo "$version"
