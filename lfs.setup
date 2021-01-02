@@ -76,13 +76,14 @@ if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
   echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-temp-tools-10.0.tar.xz" $LFS/
 
   echo ${ADMINPWD}|sudo sed -i "s/^Stage 2 :/Stage 2 : Complete/" $LFS/etc/lfs/lfs.progress
+  # Reset install log
+  echo ${ADMINPWD}|sudo rm $LFS/etc/lfs/lfs.install
+  echo ${ADMINPWD}|sudo touch $LFS/etc/lfs/lfs.install
 fi
 
 # Stage 3  
+clear
 echo "Stage 3"
-# Reset install log
-echo ${ADMINPWD}|sudo rm $LFS/etc/lfs/lfs.install
-echo ${ADMINPWD}|sudo touch $LFS/etc/lfs/lfs.install
 echo ${ADMINPWD}|sudo ./lfs.chroot stage3
 
 if [ -f /etc/bash.bashrc.NOUSE ]; then
