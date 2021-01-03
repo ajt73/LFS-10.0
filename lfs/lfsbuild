@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.1.5
+version=0.1.6
 
 setup() {
   # Stage?? buildscripts are used during the initial installation of LFS
@@ -207,6 +207,7 @@ case "${1}" in
         __install
         pkg_install
       fi
+      if [[ $(declare -F __postconfig) ]]; then __postconfig; fi
       echo $(($(date +%s)-$(awk NR==2 ${buildlog}))) >> ${buildlog}
       popd > /dev/null
       rm -rf ${srcdir}/${builddir}
