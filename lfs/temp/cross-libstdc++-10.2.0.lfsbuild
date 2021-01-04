@@ -19,14 +19,14 @@ __configure() {
     --disable-multilib                                        \
     --disable-nls                                             \
     --disable-libstdcxx-pch                                   \
-    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/10.2.0 >> ${buildlog} 2>&1 || exit $?
+    --with-gxx-include-dir=/tools/$LFS_TGT/include/c++/10.2.0 >> ${buildlog} 2>&1
 }
 
 __make() {
-  src_make || exit $?
+  src_make
 }
 
 __install() {
   inst_opts="DESTDIR=$LFS"
-  src_install || exit $?
+  src_install
 }

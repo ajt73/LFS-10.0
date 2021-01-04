@@ -15,6 +15,7 @@ __make() {
 }
 
 __install() {
+  inst_opts=""
   printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
-  cp gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin
+  cp -v gettext-tools/src/{msgfmt,msgmerge,xgettext} /usr/bin >> ${buildlog} 2>&1
 }

@@ -18,7 +18,7 @@ __configure() {
                --disable-nls              \
                --enable-shared            \
                --disable-werror           \
-               --enable-64-bit-bfd >> ${logdir}/${PKG}-${VER} 2>&1
+               --enable-64-bit-bfd >> ${buildlog} 2>&1
 }
 
 __make() {

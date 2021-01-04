@@ -10,8 +10,8 @@ __prepare() {
 }
 
 __configure() {
-  conf_opts="ADJTIME_PATH=/var/lib/hwclock/adjtime    \
-              --docdir=/usr/share/doc/util-linux-2.36 \
+  conf_opts="ADJTIME_PATH=/var/lib/hwclock/adjtime \
+              --docdir=/usr/share/doc/$PKG-$VER    \
               --disable-chfn-chsh  \
               --disable-login      \
               --disable-nologin    \

@@ -6,7 +6,7 @@ MD5="731356dec4b1109b812fecfddfead6b2"
 SBU="0.2"
 
 __configure() {
-  conf_opts="--prefix=/usr   \
+  conf_opts="--prefix=/usr     \
             --host=$LFS_TGT \
             --build=$(build-aux/config.guess)"
   src_configure

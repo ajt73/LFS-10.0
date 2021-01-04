@@ -7,8 +7,8 @@ SBU="0.1"
 
 __configure() {
   conf_opts="--prefix=/usr   \
-            --host=$LFS_TGT \
-            --build=$(build-aux/config.guess)"
+             --host=$LFS_TGT \
+             --build=$(build-aux/config.guess)"
   src_configure
 }
 

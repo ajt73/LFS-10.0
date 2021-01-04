@@ -11,8 +11,8 @@ __prepare() {
 
 __configure() {
   conf_opts="--prefix=/usr   \
-            --host=$LFS_TGT \
-            --build=$(./config.guess)"
+             --host=$LFS_TGT \
+             --build=$(./config.guess)"
   src_configure
 }
 

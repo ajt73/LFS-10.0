@@ -7,8 +7,8 @@ SBU="0.2"
 
 __configure() {
   conf_opts="--prefix=/usr   \
-            --host=$LFS_TGT \
-            --bindir=/bin"
+             --host=$LFS_TGT \
+             --bindir=/bin"
   src_configure
 }
 

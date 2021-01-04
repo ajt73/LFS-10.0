@@ -10,7 +10,8 @@
 # http://www.linuxfromscratch.org/lfs/
 # Chapters 4 to 6
 #
-# Version 0.1
+# Version 0.2
+set -e
 
 if [ $UID -eq 0 ]; then
   echo "Error: Must not be root"
@@ -20,7 +21,7 @@ fi
 if [ -s $1 ]; then ADMINPWD=$1; fi
 
 # Initial directory structure
-mkdir -p $LFS/{bin,etc,lib,sbin,usr,var}
+mkdir -p $LFS/{bin,etc,lib,sbin,usr/bin,var}
 case $(uname -m) in
   x86_64) mkdir -p $LFS/lib64 ;;
 esac
@@ -32,14 +33,14 @@ LC_ALL=POSIX
 LFS_TGT=$(uname -m)-lfs-linux-gnu
 PATH=/usr/bin
 if [ ! -L /bin ]; then PATH=/bin:$PATH; fi
-PATH=$LFS/tools/bin:$PATH
+PATH=$LFS/tools/bin:$PATH:$LFS/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Setup the inital build system
 mkdir -p $LFS/{etc/lfs,usr/src/buildscripts,tools/bin,/var/log/lfs}
 cp -up lfs.config $LFS/etc/lfs/
 cp -Rup ../* -t $LFS/usr/src/buildscripts/
-mv -u $LFS/usr/src/buildscripts/lfsbuild $LFS/tools/bin/
+mv -u $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
 
 touch $LFS/etc/lfs/lfs.install
 
@@ -57,12 +58,10 @@ pushd $LFS/usr/src > /dev/null
 #  done < wget-list
 popd > /dev/null
 
-clear
+#clear
 
 # Build temporary toolchain
-lfsbuild stage1.lfsbuild || exit $?
-
-mv $LFS/tools/bin/lfsbuild $LFS/usr/bin/
+lfsbuild stage1.lfsbuild
 
 # Change ownership of the LFS directories and files to root
 echo ${ADMINPWD}|sudo chown -R root:root $LFS/{usr,lib,var,etc,bin,sbin,tools}
@@ -70,7 +69,7 @@ case $(uname -m) in
   x86_64) echo ${ADMINPWD}|sudo chown -R root:root $LFS/lib64 ;;
 esac
 
-clear
+#clear
 echo "Stage 1 Complete"
 #echo ${ADMINPWD}|sudo sed -i "s/^Stage 1 :/Stage 1 : Complete/" $LFS/etc/lfs/lfs.progress
 

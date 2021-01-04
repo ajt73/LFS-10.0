@@ -15,7 +15,7 @@ __configure() {
                -Dsitelib=/usr/lib/perl5/5.32/site_perl     \
                -Dsitearch=/usr/lib/perl5/5.32/site_perl    \
                -Dvendorlib=/usr/lib/perl5/5.32/vendor_perl \
-               -Dvendorarch=/usr/lib/perl5/5.32/vendor_perl >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+               -Dvendorarch=/usr/lib/perl5/5.32/vendor_perl >> ${buildlog} 2>&1
 }
 
 __make() {

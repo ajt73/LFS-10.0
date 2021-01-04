@@ -46,7 +46,7 @@ __configure() {
     --disable-libssp                               \
     --disable-libvtv                               \
     --disable-libstdcxx                            \
-    --enable-languages=c,c++ >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+    --enable-languages=c,c++ >> ${buildlog} 2>&1
 }
 
 __make() {

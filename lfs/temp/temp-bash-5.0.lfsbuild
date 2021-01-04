@@ -10,16 +10,16 @@ __configure() {
              --build=$(support/config.guess) \
              --host=$LFS_TGT                 \
              --without-bash-malloc"
-  src_configure || exit $?
+  src_configure
 }
 
 __make() {
-  src_make || exit $?
+  src_make
 }
 
 __install() {
   inst_opts="DESTDIR=$LFS"
-  src_install || exit $?
+  src_install
   mv $LFS/usr/bin/bash $LFS/bin/bash
   ln -sf bash $LFS/bin/sh
 }

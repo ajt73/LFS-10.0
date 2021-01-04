@@ -6,9 +6,9 @@ MD5="35b5a3d0254c1c59be9736373d429db7"
 SBU="1.2"
 
 __configure() {
-  conf_opts="--prefix=/usr   \
-            --enable-shared  \
-            --without-ensurepip"
+  conf_opts="--prefix=/usr      \
+             --enable-shared    \
+             --without-ensurepip"
   src_configure
 }
 

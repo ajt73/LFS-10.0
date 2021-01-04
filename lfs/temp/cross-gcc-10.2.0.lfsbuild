@@ -46,17 +46,21 @@ __configure() {
     --disable-libssp                               \
     --disable-libvtv                               \
     --disable-libstdcxx                            \
-    --enable-languages=c,c++ >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+    --enable-languages=c,c++ >> ${buildlog} 2>&1
 }
 
 __make() {
-  MAKEFLAGS="-j1"
-  src_make || exit $?
+  make_conf="-j1"
+  src_make
 }
 
 __install() {
-  src_install || exit $?
+  src_install
+}
+
+__postconfig(){
   cd ..
   cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
   $(dirname $($LFS_TGT-gcc -print-libgcc-file-name))/install-tools/include/limits.h
 }
+

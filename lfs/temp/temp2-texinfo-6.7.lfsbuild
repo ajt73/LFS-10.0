@@ -6,7 +6,6 @@ MD5="d4c5d8cc84438c5993ec5163a59522a6"
 SBU="0.3"
 
 __configure() {
-  conf_opts="--prefix=/usr"
   src_configure
 }
 

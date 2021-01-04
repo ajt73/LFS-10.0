@@ -6,8 +6,7 @@ MD5="e7c8c321351ebdf70f5f0825f3faaee2"
 SBU="0.3"
 
 __configure() {
-  conf_opts="--prefix=/usr \
-             --docdir=/usr/share/doc/bison-3.7.1"
+  conf_opts="--prefix=/usr --docdir=/usr/share/doc/$PKG-$VER"
   src_configure
 }
 

@@ -76,7 +76,7 @@ chmod 664  /var/log/lastlog
 chmod 600  /var/log/btmp
 
 # Build temporary toolchain
-lfsbuild stage2.lfsbuild || exit 1
+lfsbuild stage2.lfsbuild
 
 # Cleanup
 #find /usr/{lib,libexec} -name \*.la -delete

@@ -6,14 +6,15 @@ MD5="2656fe1a0942856c8740468d175e39b6"
 SBU="0.2"
 
 __prepare() {
-  make mrproper >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+  make mrproper >> ${buildlog} 2>&1
 }
 
 __make() {
-  make headers >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+  make headers >> ${buildlog} 2>&1
 }
 
 __install() {
+  inst_opts="DESTDIR="
   find usr/include -name '.*' -delete
   rm usr/include/Makefile
   cp -r usr/include $LFS/usr

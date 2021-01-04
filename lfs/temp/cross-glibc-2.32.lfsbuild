@@ -32,16 +32,21 @@ __configure() {
       --build=$(../scripts/config.guess) \
       --enable-kernel=3.2                \
       --with-headers=$LFS/usr/include    \
-      libc_cv_slibdir=/lib >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+      libc_cv_slibdir=/lib >> ${buildlog} 2>&1
 }
 
 __make() {
   src_make || exit $?
 }
 
-glib_test() {
+__install() {
+  inst_opts="DESTDIR=$LFS"
+  src_install
+}
+
+__postconfig() {
   echo 'int main(){}' > dummy.c
-  $LFS_TGT-gcc dummy.c || exit $?
+  $LFS_TGT-gcc dummy.c
   case $(uname -m) in
     x86_64)
       interpreter="/lib64/ld-linux-x86-64.so.2"
@@ -56,11 +61,5 @@ glib_test() {
     exit 1
   fi
   rm dummy.c a.out
-}
-
-__install() {
-  printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
-  make DESTDIR=$LFS install >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
-  glib_test || exit 1
-  $LFS/tools/libexec/gcc/$LFS_TGT/10.2.0/install-tools/mkheaders
+  $LFS/tools/libexec/gcc/$LFS_TGT/10.2.0/install-tools/mkheaders >> ${buildlog} 2>&1
 }

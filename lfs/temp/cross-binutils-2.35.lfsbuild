@@ -17,15 +17,16 @@ __configure() {
                --with-sysroot=$LFS \
                --target=$LFS_TGT   \
                --disable-nls       \
-               --disable-werror >> ${logdir}/${PKG}-${VER} 2>&1 || exit $?
+               --disable-werror >> ${buildlog} 2>&1
 }
 
 __make() {
-  src_make || exit $?
+  make_conf="-j1"
+  src_make
 }
 
 __install() {
-  src_install || exit $?
+  src_install
   endtime=$(date +%s)
   SBU=$((endtime-starttime))
   echo "1 SBU = $SBU seconds"

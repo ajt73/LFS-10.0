@@ -19,7 +19,7 @@ __configure() {
       --disable-multilib               \
       --disable-nls                    \
       --host=$(uname -m)-lfs-linux-gnu \
-      --disable-libstdcxx-pch >> ${logdir}/${PKG}-${VER} 2>&1 || exit 1
+      --disable-libstdcxx-pch >> ${buildlog} 2>&1
 }
 
 __make() {
