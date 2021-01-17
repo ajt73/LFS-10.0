@@ -1,0 +1,43 @@
+PKG="binutils"
+VER="2.35"
+HOMEPAGE="http://www.gnu.org/software/binutils/"
+URL="http://ftp.gnu.org/gnu/${PKG}/${PKG}-${VER}.tar.xz"
+MD5="fc8d55e2f6096de8ff8171173b6f5087"
+SBU=6.5
+
+__prepare() {
+  if [[ $(expect -c "spawn ls") != "spawn ls" ]]; then
+    echo "The system has no more ptys!"
+    exit 1
+  fi
+  sed -i '/@\tincremental_copy/d' gold/testsuite/Makefile.in
+  mkdir build
+  cd build
+}
+
+__configure() {
+  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  ../configure --prefix=/usr       \
+               --enable-gold       \
+               --enable-ld=default \
+               --enable-plugins    \
+               --enable-shared     \
+               --disable-werror    \
+               --enable-64-bit-bfd \
+               --with-system-zlib >> ${buildlog} 2>&1
+}
+
+__make() {
+  make_opts="$make_opts tooldir=/usr"
+  src_make
+}
+
+__test(){
+  printf "Testing $GREEN$PKG-$VER $DEFAULT\n"
+  make -k check >> ${buildlog}-test 2>&1
+}
+
+__install() {
+  inst_opts="$instopts tooldir=/usr
+  src_install
+}
