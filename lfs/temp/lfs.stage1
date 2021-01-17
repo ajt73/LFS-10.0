@@ -37,7 +37,7 @@ PATH=$LFS/tools/bin:$PATH:$LFS/usr/bin
 export LFS LC_ALL LFS_TGT PATH
 
 # Setup the inital build system
-mkdir -p $LFS/{etc/lfs,usr/src/buildscripts,tools/bin,/var/log/lfs}
+mkdir -p $LFS/{etc/lfs,usr/src/{buildscripts,pkg},tools/bin,/var/log/lfs}
 cp -up lfs.config $LFS/etc/lfs/
 cp -Rup ../* -t $LFS/usr/src/buildscripts/
 mv -u $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
@@ -48,14 +48,16 @@ touch $LFS/etc/lfs/lfs.install
 echo "Checking source code"
 if [ -d ../../src ]; then cp -u ../../src/* $LFS/usr/src; fi
 pushd $LFS/usr/src > /dev/null
-#  wget -Nq http://www.linuxfromscratch.org/lfs/downloads/stable/wget-list
-#  # We are building System V, not systemd
-#  sed -i '/systemd/d' wget-list
-#  while read -r url; do
-#    if [[ ! -f ${url##*/} ]]; then 
-#      wget -Ncq --show-progress ${url}
-#   fi
-#  done < wget-list
+  if [ ! -f "./wget-list" ]; then
+    wget -Nq http://www.linuxfromscratch.org/lfs/downloads/stable/wget-list
+    # We are building System V, not systemd
+    sed -i '/systemd/d' wget-list
+  fi
+  while read -r url; do
+    if [[ ! -f ${url##*/} ]]; then 
+      wget -Ncq --show-progress ${url}
+   fi
+  done < wget-list
 popd > /dev/null
 
 #clear

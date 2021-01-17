@@ -12,7 +12,7 @@ __prepare() {
 }
 
 __configure() {
-  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Configuring $GREEN$PKG-$VER $DEFAULT"
   ../configure --prefix=$LFS/tools \
                --with-sysroot=$LFS \
                --target=$LFS_TGT   \
@@ -26,6 +26,8 @@ __make() {
 }
 
 __install() {
+  echo -e "Installing  $GREEN$PKG-$VER $DEFAULT"
+  inst_opts=""
   src_install
   endtime=$(date +%s)
   SBU=$((endtime-starttime))

@@ -14,7 +14,7 @@ __configure() {
   # src_configure
   #
   # (custom)
-  # printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  # echo -e "Configuring $GREEN$PKG-$VER $DEFAULT"
   # [configure] >> ${buildlog} 2>&1
   :
 }
@@ -24,7 +24,7 @@ __make() {
   # src_make
   #
   # (custom)
-  # printf "Compiling $GREEN$PKG-$VER $DEFAULT\n"
+  # echo -e "Compiling $GREEN$PKG-$VER $DEFAULT"
   # [compile] >> ${buildlog} 2>&1
   :
 }
@@ -38,11 +38,7 @@ __install() {
   # src_install
   #
   # (custom)
-  # printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
+  # echo -e "Installing $GREEN$PKG-$VER $DEFAULT"
   # [install] >> ${builddir} 2>&1
-  :
-}
-
-__postconfig(){
   :
 }

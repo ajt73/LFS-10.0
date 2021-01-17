@@ -11,7 +11,15 @@
 #set -x
 set -eo pipefail
 
-version=0.1.6
+version=0.2.0
+
+# Colours
+DEFAULT="\e[39m"
+RED="\e[31m"
+GREEN="\e[32m"
+ORANGE="\e[33m"
+BLUE="\e[34m"
+CYAN="\e[36m"
 
 setup() {
   # Stage?? buildscripts are used during the initial installation of LFS
@@ -19,19 +27,20 @@ setup() {
   case ${1} in
     stage1*|cross-*|temp-*)
       LFS=/mnt/lfs
-      usr=${LFS}/usr
-      etc=${LFS}/etc
-      var=${LFS}/var
+      rootdir=$LFS
       ;;
     *)
-      usr=/usr
-      etc=/etc
-      var=/var
+      rootdir=""
       ;;
   esac
+
+  usr=${rootdir}/usr
+  etc=${rootdir}/etc
+  var=${rootdir}/var
   
   srcdir=${usr}/src
   buildscripts=${srcdir}/buildscripts
+  pkgdir=${srcdir}/pkg
   logdir=${var}/log/lfs
   lfsconfig=${etc}/lfs/lfs.config
   install_log=${etc}/lfs/lfs.install
@@ -40,7 +49,6 @@ setup() {
     SBUref=$(grep SBU= ${lfsconfig})
     SBUref=${SBUref#*=}
   fi
-  checkbuildfile "${1}"
 }
 
 checkbuildfile() {
@@ -61,7 +69,12 @@ checkbuildfile() {
 src_fetch() {
   if [[ ! -f ${srcdir}/${tarball} ]]; then
     printf "Downloading $GREEN$tarball $DEFAULT\n"
-    wget -q ${URL}
+    if [[ -z $nocheck ]]; then
+      wget -q ${URL}
+    else
+      wget -q ${URL} --no-check-certificate
+      nocheck=""
+    fi
   fi
   if [[ -n $MD5 ]]; then
     md5=$(md5sum ${tarball})
@@ -73,7 +86,7 @@ src_fetch() {
 }
 
 src_unpack() {
-#  printf "Unpacking $GREEN$PKG-$VER $DEFAULT\n"
+#  echo -e "Unpacking $GREEN$PKG-$VER $DEFAULT"
   # Identify the unpacked folder name
   builddir=$(tar '--exclude=*/*/*' -tf ${tarball} | tail -n 1)
   builddir=${builddir%%/*}
@@ -88,7 +101,7 @@ src_patch() {
   for srcpatch in ${PATCH[@]}; do
     srcpatch=${srcpatch##*/}
     if [[ ! -f ${srcdir}/${srcpatch} ]]; then
-      printf "Downloading $GREEN$srcpatch $DEFAULT\n"
+      echo -e "Downloading $GREEN$srcpatch $DEFAULT"
       wget -q ${srcpatch}
     fi
     md5=$(md5sum ${srcdir}/${srcpatch})
@@ -108,31 +121,49 @@ src_configure() {
 }
 
 src_make() {
-  printf "Compiling $GREEN$PKG-$VER $DEFAULT\n"
+  printf "Compiling   $GREEN$PKG-$VER $DEFAULT\n"
   make ${make_opts} >> ${logdir}/${PKG}-${VER} 2>&1
 }
 
 src_test() {
-  printf "Testing $GREEN$PKG-$VER $DEFAULT\n"
+  printf "Testing   $GREEN$PKG-$VER $DEFAULT\n"
   make test > ${logdir}/${PKG}-${VER}-test 2>&1
 }
 
 src_install() {
-  printf "Installing $GREEN$PKG-$VER $DEFAULT\n"
+  printf "Installing  $GREEN$PKG-$VER $DEFAULT\n"
   make install ${inst_opts} >> ${logdir}/${PKG}-${VER} 2>&1
 }
 
 pkg_install() {
-  cp -r ${installdir}/* /
+  # If buildfile uses a non-standard DESTDIR location, it is responsible
+  # for the final installation. Should only be used during initial bootstrap
+  if [[ ${inst_opts} == *"DESTDIR=$installdir"* ]]; then
+    # Create package archive
+    echo -e "Packaging   $GREEN$PKG-$VER $DEFAULT"
+    pushd ${installdir} > /dev/null
+    if [[ -f ${pkgdir}/${builddir}.tar.xz ]]; then 
+      rm -f ${pkgdir}/${builddir}.tar.xz
+    fi
+    tar -cJpf ${pkgdir}/${builddir}.tar.xz *
+    popd > /dev/null
+    echo -e "Deploying   $GREEN$PKG-$VER $DEFAULT"
+    # Unpack the package into the root directory 
+    pushd / > /dev/null
+    tar xf ${pkgdir}/${builddir}.tar.xz
+    popd > /dev/null
+  fi
 }
 
 __help() {
-  echo "Linux From Scratch"
+  echo "Linux From Scratch package manager"
   echo
   echo "Options"
-  echo "-b {pkg} : Build package without installing it"
+  echo -e "$ORANGE-b {pkg} : Build package archive$DEFAULT"
   echo "-d {pkg} : Download package tarball"
+  echo "-D {pkg} : Download package tarball using https (Unsecure)"
   echo "-h       : Show help (this page)"
+  echo -e "$ORANGE-i {pkg} : Install pre-built package archive$DEFAULT"
   echo "-s       : Synchronise the local buildfiles with the master buildfiles"
   echo "-v       : Show the version number"
   echo "{pkg}    : Build and install package"
@@ -148,8 +179,9 @@ case "${1}" in
   ""|-h)  # Help
     __help
   ;;
-  -d)     # Download tarball
+  -d|-D)  # Download tarball
     setup ${1}
+    if [[ $1 == "-D" ]]; then nocheck=1; fi
     if [[ ${URL} != "" ]]; then
       src_fetch
     else
@@ -168,6 +200,7 @@ case "${1}" in
   ;;
   *)      # Build and install
     setup ${1}
+    checkbuildfile ${1}
     if [[ ${SBU} != "" ]]; then
       P=${buildfile##*/}
       P=${P%.*}
@@ -180,7 +213,7 @@ case "${1}" in
         printf "Estimated Build Time: $CYAN${buildtime} $DEFAULT\n"
       fi
     fi
-    if [ -n REQUIRE ]; then
+    if [ -n ${REQUIRE} ]; then
     # Resolve dependancies
       for dep in ${REQUIRE[@]}; do
         lfsbuild ${dep}

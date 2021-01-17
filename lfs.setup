@@ -8,6 +8,7 @@
 # http://www.linuxfromscratch.org/lfs/
 #
 # Version 0.2
+set -eo pipefail
 
 echo "Linux From Scratch installation script"
 echo "Version 10.0"
@@ -35,7 +36,7 @@ fi
 
 if [[ ! -f ${progress} ]]; then
   echo ${ADMINPWD}|sudo mkdir -p $LFS/etc/lfs
-  echo ${ADMINPWD}|sudo sudo bash -c "{ echo -e 'Stage 1 :\nStage 2 :\nSystem  :'; } > ${progress}"
+  echo ${ADMINPWD}|sudo bash -c "{ echo -e 'Stage 1 :\nStage 2 :\nSystem  :'; } > ${progress}"
 fi
 
 pushd lfs/temp >/dev/null
@@ -59,7 +60,7 @@ fi
   
 # Stage 2
 if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
-  echo ${ADMINPWD}|sudo ./lfs.chroot stage2
+  echo ${ADMINPWD}|sudo ./lfs.chroot stage2 || exit $?
   
   # Cleanup
   echo ${ADMINPWD}|sudo find $LFS/usr/{lib,libexec} -name \*.la -delete
@@ -89,7 +90,7 @@ fi
 # Stage 3  
 #clear
 echo "Stage 3"
-echo ${ADMINPWD}|sudo ./lfs.chroot stage3
+echo ${ADMINPWD}|sudo ./lfs.chroot stage3 || exit $?
 
 if [ -f /etc/bash.bashrc.NOUSE ]; then
   echo ${ADMINPWD}|sudo mv /etc/bash.bashrc.NOUSE /etc/bash.bashrc

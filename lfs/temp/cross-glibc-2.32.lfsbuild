@@ -42,9 +42,8 @@ __make() {
 __install() {
   inst_opts="DESTDIR=$LFS"
   src_install
-}
 
-__postconfig() {
+  # Sanity check
   echo 'int main(){}' > dummy.c
   $LFS_TGT-gcc dummy.c
   case $(uname -m) in

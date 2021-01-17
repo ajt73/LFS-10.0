@@ -14,8 +14,8 @@ __make() {
 }
 
 __install() {
-  inst_opts="DESTDIR="
+  inst_opts=""
   find usr/include -name '.*' -delete
   rm usr/include/Makefile
-  cp -r usr/include $LFS/usr
+  cp -rv usr/include $LFS/usr >> ${buildlog} 2>&1
 }

@@ -26,7 +26,7 @@ __prepare() {
 }
 
 __configure() {
-  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Configuring $GREEN$PKG-$VER $DEFAULT"
   ../configure                                     \
     --target=$LFS_TGT                              \
     --prefix=$LFS/tools                            \
@@ -50,17 +50,17 @@ __configure() {
 }
 
 __make() {
-  make_conf="-j1"
+  make_opts="-j1"
   src_make
 }
 
 __install() {
+  inst_opts=""
   src_install
-}
-
-__postconfig(){
   cd ..
   cat gcc/limitx.h gcc/glimits.h gcc/limity.h > \
-  $(dirname $($LFS_TGT-gcc -print-libgcc-file-name))/install-tools/include/limits.h
+    $(dirname $($LFS_TGT-gcc -print-libgcc-file-name))/install-tools/include/limits
 }
+
+
 
