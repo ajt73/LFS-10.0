@@ -23,5 +23,6 @@ __make() {
 }
 
 __install() {
+inst_opts="BUILDDIR="
   src_install
 }
