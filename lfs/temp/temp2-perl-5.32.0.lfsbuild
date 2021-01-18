@@ -23,6 +23,8 @@ __make() {
 }
 
 __install() {
-inst_opts="BUILDDIR="
+#  install -d ${installdir}/usr/share/man/{man1,man3}
+inst_opts=""
   src_install
+#exit 99
 }
