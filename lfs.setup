@@ -62,15 +62,16 @@ fi
 
 # Stage 2
 if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
+  clear
   echo ${ADMINPWD}|sudo ./lfs.chroot stage2 || exit $?
 
   # Cleanup
+  echo "Cleaning up the temporary filesystem"
   echo ${ADMINPWD}|sudo find $LFS/usr/{lib,libexec} -name \*.la -delete
   echo ${ADMINPWD}|sudo rm -rf $LFS/usr/share/{info,man,doc}/*
   echo ${ADMINPWD}|sudo strip --strip-debug $LFS/usr/lib/*        2>/dev/null || true 
   echo ${ADMINPWD}|sudo strip --strip-unneeded $LFS/usr/{,s}bin/* 2>/dev/null || true
   echo ${ADMINPWD}|sudo strip --strip-unneeded $LFS/tools/bin/*   2>/dev/null || true
-
   echo ${ADMINPWD}|sudo chown -R root:root $LFS/ 2>/dev/null
 
   # Backup temporary filesystem
@@ -78,13 +79,12 @@ if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
   # Remove Trash folder if present
   echo ${ADMINPWD}|sudo rm -rf $LFS/.Trash-1000
   rm -f "$(dirname $0)/../../lfs-temp-tools-10.0.tar.xz"
-  #rm -f ~/lfs-temp-10.0.tar.gz
   echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-temp-tools-10.0.tar.xz" \
     --exclude=$LFS/dev \
     --exclude=$LFS/mnt \
     --exclude=$LFS/proc \
     --exclude=$LFS/sys \
-    --exclude=$LFS/tmp $LFS/
+    --exclude=$LFS/tmp $LFS/ >/dev/null
   
   echo ${ADMINPWD}|sudo sed -i "s/^Stage 2 :/Stage 2 : Complete/" $LFS/etc/lfs/lfs.progress
   # Reset install log
@@ -93,7 +93,7 @@ if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
 fi
 
 # Stage 3  
-#clear
+clear
 echo "Stage 3"
 echo ${ADMINPWD}|sudo ./lfs.chroot stage3 || exit $?
 
