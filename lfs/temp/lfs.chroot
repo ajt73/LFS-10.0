@@ -1,5 +1,24 @@
 #!/bin/bash
 #
+set -e
+trap '_err $? $LINENO' ERR
+trap '_exit $?' EXIT
+
+_err() {
+  echo "Error $1 : Line $2"
+  exit $1
+}
+
+_exit() {
+  # Unmount temporary filesystems
+  if [[ $(mount | grep $LFS/run)     ]]; then umount $LFS/run; fi
+  if [[ $(mount | grep $LFS/sys)     ]]; then umount $LFS/sys; fi
+  if [[ $(mount | grep $LFS/proc)    ]]; then umount $LFS/proc; fi
+#  if [[ $(mount | grep $LFS/dev/pts) ]]; then umount $LFS/dev/pts; fi
+#  if [[ $(mount | grep $LFS/dev)     ]]; then umount $LFS/dev; fi
+  echo "Leaving chroot"
+  exit $1
+}
 
 LFS=/mnt/lfs
 
@@ -18,13 +37,19 @@ esac
 
 # Prepare virtual filesystems
 mkdir -p $LFS/{dev,proc,sys,run}
-mknod -m 600 $LFS/dev/console c 5 1   2>/dev/null
-mknod -m 666 $LFS/dev/null c 1 3   2>/dev/null
-mount --bind /dev $LFS/dev
-mount --bind /dev/pts $LFS/dev/pts
-mount -t proc proc $LFS/proc 2>/dev/null
-mount -t sysfs sysfs $LFS/sys 2>/dev/null
-mount -t tmpfs tmpfs $LFS/run 2>/dev/null
+if [ ! -c $LFS/dev/console ]; then
+  mknod -m 600 $LFS/dev/console c 5 1
+  mknod -m 666 $LFS/dev/null c 1 3
+fi
+if [[ ! $(mount | grep $LFS/dev) ]]; then
+  mount --bind /dev $LFS/dev
+  mount --bind /dev/pts $LFS/dev/pts
+fi
+if [[ ! $(mount | grep $LFS/proc) ]]; then
+  mount -t proc proc $LFS/proc
+  mount -t sysfs sysfs $LFS/sys
+  mount -t tmpfs tmpfs $LFS/run
+fi
 
 if [ -h $LFS/dev/shm ]; then
   mkdir -p $LFS/$(readlink $LFS/dev/shm)
@@ -38,10 +63,5 @@ chroot "$LFS" /usr/bin/env -i   \
     PATH=/bin:/usr/bin:/sbin:/usr/sbin \
     /bin/bash --login +h ${chrootscript}
 
-#umount $LFS/run    
-#umount $LFS/sys
-#umount $LFS/proc
-#umount $LFS/dev/pts
-#umount $LFS/dev
 
     
