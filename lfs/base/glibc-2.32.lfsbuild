@@ -29,8 +29,8 @@ __make() {
 
 __test() {
   case $(uname -m) in
-    i?86)   ln -sfnv $PWD/elf/ld-linux.so.2        /lib ;;
-    x86_64) ln -sfnv $PWD/elf/ld-linux-x86-64.so.2 /lib ;;
+    i?86)   ln -sfn $PWD/elf/ld-linux.so.2        /lib ;;
+    x86_64) ln -sfn $PWD/elf/ld-linux-x86-64.so.2 /lib ;;
   esac
   src_test
 }
@@ -71,7 +71,7 @@ __install() {
   localedef -i zh_CN -f GB18030 zh_CN.GB18030
   localedef -i zh_HK -f BIG5-HKSCS zh_HK.BIG5-HKSCS
   
-  at > ${installdir}/etc/nsswitch.conf << "EOF"
+  cat > ${installdir}/etc/nsswitch.conf << "EOF"
 # Begin /etc/nsswitch.conf
 
 passwd: files
@@ -87,5 +87,15 @@ ethers: files
 rpc: files
 
 # End /etc/nsswitch.conf
+EOF
+
+  cat > ${installdir}/etc/ld.so.conf << "EOF"
+# Begin /etc/ld.so.conf
+/usr/local/lib
+/opt/lib
+
+# Add an include directory
+include /etc/ld.so.conf.d/*.conf
+
 EOF
 }
