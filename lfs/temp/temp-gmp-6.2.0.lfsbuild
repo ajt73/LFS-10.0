@@ -3,6 +3,6 @@ VER="6.2.0"
 HOMEPAGE="http://www.gnu.org/software/$PKG/"
 URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.xz"
 MD5="a325e3f09e6d91e62101e59f9bda3ec1"
-SBC=""
+SBU=""
 
 # Just download source code
