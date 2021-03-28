@@ -15,16 +15,19 @@ ln -s bash /bin/sh
 
 # Install missing packages
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq
-apt-get upgrade -qq
+apt-get update
+apt-get upgrade
 # Install packages required by LFS
-apt-get install -qq -y bison gawk texinfo
+apt-get install -y bison gawk texinfo
 # Install packages required by lfsbuild
-apt-get install -qq -y bc wget
+apt-get install -y bc wget
 # Install optional packages to aid development
-apt-get install -qq -y openssh-server shellcheck git
+apt-get install -y openssh-server shellcheck git
 
 # Update keymap to UK
 setxkbmap gb
+# Set time to GB time.
+rm /etc/localtime
+ln -s /usr/share/zoneinfo/GB /etc/localtime
 
 echo "IP : $(hostname -I | cut -d ' ' -f 1)"
