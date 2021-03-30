@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.2.0
+version=0.2.1
 
 # Colours
 DEFAULT="\e[39m"
@@ -127,7 +127,9 @@ src_make() {
 
 src_test() {
   printf "Testing   $GREEN$PKG-$VER $DEFAULT\n"
-  make test > ${logdir}/${PKG}-${VER}-test 2>&1
+  testcommand=${1}
+  if [ -z ${testcommand} ]; then testcommand="test"; fi
+  make ${testcommand} > ${logdir}/${PKG}-${VER}-test 2>&1 
 }
 
 src_install() {
