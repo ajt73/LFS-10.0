@@ -16,3 +16,8 @@ __install() {
   install -dm755  ${installdir}/usr/share/doc/$PKG-$VER
   install -m644   doc/dejagnu.{html,txt} ${installdir}/usr/share/doc/$PKG-$VER
 }
+
+__postconfig() {
+  printf "Testing   $GREEN$PKG-$VER $DEFAULT\n"
+  make check > ${logdir}/${PKG}-${VER}-test 2>&1 
+}

@@ -71,9 +71,3 @@ case $(uname -m) in
   x86_64) echo ${ADMINPWD}|sudo chown -R root:root $LFS/lib64 ;;
 esac
 
-clear
-echo "Stage 1 Complete"
-#echo ${ADMINPWD}|sudo sed -i "s/^Stage 1 :/Stage 1 : Complete/" $LFS/etc/lfs/lfs.progress
-
-#echo "Entering chroot for Stage 2"
-#echo ${ADMINPWD}|sudo $LFS/usr/src/buildscripts/temp/lfs.chroot stage2

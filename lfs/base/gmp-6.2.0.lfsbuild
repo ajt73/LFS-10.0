@@ -19,7 +19,8 @@ __make() {
 }
 
 __test() {
-  src_test
+  src_check
+  awk '/# PASS:/{total+=$3} ; END{print total}' ${buildlog}-test
 }
 
 __install() {

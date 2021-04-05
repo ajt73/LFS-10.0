@@ -32,15 +32,16 @@ __test() {
     i?86)   ln -sfn $PWD/elf/ld-linux.so.2        /lib ;;
     x86_64) ln -sfn $PWD/elf/ld-linux-x86-64.so.2 /lib ;;
   esac
-  src_test
+  src_check
 }
 
 __install() {
+  mkdir -p ${installdir}/etc
   touch ${installdir}/etc/ld.so.conf
   sed '/test-installation/s@$(PERL)@echo not running@' -i ../Makefile
   src_install
-  cp -v ../nscd/nscd.conf ${installdir}/etc/nscd.conf
-  mkdir -pv ${installdir}/var/cache/nscd
+  cp ../nscd/nscd.conf ${installdir}/etc/nscd.conf
+  mkdir -p ${installdir}/var/cache/nscd
   
   mkdir -p /usr/lib/locale
   localedef -i POSIX -f UTF-8 C.UTF-8 2> /dev/null || true
@@ -49,7 +50,7 @@ __install() {
   localedef -i de_DE@euro -f ISO-8859-15 de_DE@euro
   localedef -i de_DE -f UTF-8 de_DE.UTF-8
   localedef -i el_GR -f ISO-8859-7 el_GR
-  localedef -i en_UK -f ISO-8859-1 en_UK
+  localedef -i en_GB -f ISO-8859-1 en_GB
   localedef -i en_GB -f UTF-8 en_GB.UTF-8
   localedef -i en_HK -f ISO-8859-1 en_HK
   localedef -i en_PH -f ISO-8859-1 en_PH

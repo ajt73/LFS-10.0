@@ -65,7 +65,6 @@ nogroup:x:99:
 users:x:999:
 EOF
 
-#echo "tester:x:$(ls -n $(tty) | cut -d" " -f3):101::/home/tester:/bin/bash" >> /etc/passwd
 echo "tester:x:101:101::/home/tester:/bin/bash" >> /etc/passwd
 echo "tester:x:101:" >> /etc/group
 install -o tester -d /home/tester
@@ -78,17 +77,3 @@ chmod 600  /var/log/btmp
 # Build temporary toolchain
 lfsbuild stage2.lfsbuild
 
-# Cleanup
-#find /usr/{lib,libexec} -name \*.la -delete
-#rm -rf /usr/share/{info,man,doc}/*
-#strip --strip-debug /usr/lib/*        2>/dev/null
-#strip --strip-unneeded /usr/{,s}bin/* 2>/dev/null
-#strip --strip-unneeded /tools/bin/*   2>/dev/null
-
-#chown -R root:root / 2>/dev/null
-
-# Backup temporary filesystem
-#tar -cJpf /usr/src/lfs-temp-tools-10.0.tar.xz --exclude=lfs-temp-tools-10.0.tar.xz /
-
-# Start the main system build
-#/usr/src/buildscripts/lfs/lfs.stage3

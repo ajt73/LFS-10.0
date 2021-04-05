@@ -14,7 +14,7 @@
 
 echo "Building main LFS filesystem"
 
-lfsbuild lfs-10.0 || exit $?
+lfsbuild lfs-10.0 || exit
 
 # Strip unneeded debugging symbols
 save_lib="ld-2.32.so libc-2.32.so libpthread-2.32.so libthread_db-1.0.so"
@@ -59,7 +59,7 @@ find /usr -depth -name $(uname -m)-lfs-linux-gnu\* | xargs rm -rf
 rm -rf /tools
 userdel -r tester
 
-lfsbuild lfs-bootscripts-20200818 || exit $?
+lfsbuild lfs-bootscripts-20200818 || exit
 
 bash /lib/udev/init-net-rules.sh
 

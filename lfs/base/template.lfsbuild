@@ -30,7 +30,9 @@ __make() {
 }
 
 __test() {
-  # src_test
+  # src_check - make check
+  # or
+  # src_test  - make test
   :
 }
 

@@ -14,7 +14,7 @@ __make() {
 }
 
 __test() {
-  src_test
+  src_check
 }
 
 __install() {
