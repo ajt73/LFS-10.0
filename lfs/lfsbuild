@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.2.1
+version=0.2.2
 
 # Colours
 DEFAULT="\e[39m"
@@ -109,7 +109,7 @@ src_patch() {
       echo "Error: Bad checksum for ${srcpatch}"
       exit 1
     fi
-    patch -Np1 -i ${srcdir}/${srcpatch} >> ${logdir}/${PKG}-${VER} 2>&1
+    patch -Np1 -i ${srcdir}/${srcpatch} >> ${buildlog} 2>&1
     ((p=p+1))
   done
   unset p
@@ -117,24 +117,29 @@ src_patch() {
 
 src_configure() {
   printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
-  ./configure ${conf_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+  ./configure ${conf_opts} >> ${buildlog} 2>&1
 }
 
 src_make() {
   printf "Compiling   $GREEN$PKG-$VER $DEFAULT\n"
-  make ${make_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+  make ${make_opts} >> ${buildlog} 2>&1
+}
+
+src_check() {
+  src_test check
 }
 
 src_test() {
   printf "Testing   $GREEN$PKG-$VER $DEFAULT\n"
+  # Allow both make test and make check
   testcommand=${1}
   if [ -z ${testcommand} ]; then testcommand="test"; fi
-  make ${testcommand} > ${logdir}/${PKG}-${VER}-test 2>&1 
+  make ${testcommand} > ${buildlog}-test 2>&1 
 }
 
 src_install() {
   printf "Installing  $GREEN$PKG-$VER $DEFAULT\n"
-  make install ${inst_opts} >> ${logdir}/${PKG}-${VER} 2>&1
+  make install ${inst_opts} >> ${buildlog} 2>&1
 }
 
 pkg_install() {
