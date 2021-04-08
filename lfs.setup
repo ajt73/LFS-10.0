@@ -7,12 +7,10 @@
 # Derived from Linux From Scratch, revision 10.0
 # http://www.linuxfromscratch.org/lfs/
 #
-# Version 0.3
 #set -x
 set -eo pipefail
 
-echo "Linux From Scratch installation script"
-echo "LFS Version 10.0"
+version=0.4
 
 if [ $UID -eq 0 ]; then
   echo "Error: Must not be root"
@@ -20,6 +18,8 @@ if [ $UID -eq 0 ]; then
 fi
 
 setup() {
+  echo "Linux From Scratch installation script"
+  echo "LFS Version 10.0"
   export LFS=/mnt/lfs
   bootpart=/dev/sda1
   rootpart=/dev/sda3
@@ -66,8 +66,10 @@ stage1() {
     # Remove Trash folder if present
     echo ${ADMINPWD}|sudo rm -rf $LFS/.Trash-1000
     rm -f "$(dirname $0)/../../lfs-stage-1-10.0.tar.xz"
-    echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-stage-1-10.0.tar.xz" \
-      --exclude=$LFS/usr/src $LFS/ >/dev/null
+    pushd $LFS >/dev/null
+#    echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-stage-1-10.0.tar.xz" \
+#      --exclude=$LFS/usr/src . >/dev/null
+    popd >/dev/null
 
     echo ${ADMINPWD}|sudo sed -i "s/^Stage 1 :/Stage 1 : Complete/" $LFS/etc/lfs/lfs.progress
   fi
@@ -75,6 +77,11 @@ stage1() {
 }
 
 stage2() {
+  if [[ $(grep -c "Stage 1 : Complete" ${progress}) -eq 0 ]]; then
+    echo "Error: Stage 1 must be completed before Stage 2"
+    exit 1
+  fi
+
   if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
     clear
     echo ${ADMINPWD}|sudo ./lfs.chroot stage2 || exit
@@ -93,23 +100,31 @@ stage2() {
     # Remove Trash folder if present
     echo ${ADMINPWD}|sudo rm -rf $LFS/.Trash-1000
     rm -f "$(dirname $0)/../../lfs-stage-2-10.0.tar.xz"
+    pushd $LFS >/dev/null
     echo ${ADMINPWD}|sudo tar -cJpf "$(dirname $0)/../../lfs-stage-2-10.0.tar.xz" \
       --exclude=$LFS/usr/src \
       --exclude=$LFS/dev     \
       --exclude=$LFS/mnt     \
       --exclude=$LFS/proc    \
       --exclude=$LFS/sys     \
-      --exclude=$LFS/tmp $LFS/ >/dev/null
+      --exclude=$LFS/tmp . >/dev/null
+    popd >/dev/null
     
     echo ${ADMINPWD}|sudo sed -i "s/^Stage 2 :/Stage 2 : Complete/" $LFS/etc/lfs/lfs.progress
-    # Reset install log
-    echo ${ADMINPWD}|sudo rm $LFS/etc/lfs/lfs.install
-    echo ${ADMINPWD}|sudo touch $LFS/etc/lfs/lfs.install
   fi
+
+  # Reset install log
+  echo ${ADMINPWD}|sudo rm $LFS/etc/lfs/lfs.install
+  echo ${ADMINPWD}|sudo touch $LFS/etc/lfs/lfs.install
   echo "Stage 2 Complete"
 }
 
 stage3() {
+  if [[ $(grep -c "Stage 2 : Complete" ${progress}) -eq 0 ]]; then
+    echo "Error: Stage 2 must be completed before Stage 3"
+    exit 1
+  fi
+  
   clear
   echo "Stage 3"
   echo ${ADMINPWD}|sudo ./lfs.chroot stage3 || exit
@@ -123,7 +138,6 @@ stage3() {
 case "${1}" in
   "-s1")
     setup
-#    initialise
     stage1
   ;;
   "-s2")
@@ -140,7 +154,9 @@ case "${1}" in
     stage2
     stage3
   ;;
-  "")
+  *)
+    echo "Linux From Scratch setup utility."
+    echo "Version: $version"
     echo "Usage:"
     echo "-b  : Install full base system"
     echo "-s1 : Install Stage 1"
