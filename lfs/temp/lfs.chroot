@@ -16,7 +16,7 @@ _exit() {
   if [[ $(mount | grep $LFS/proc)    ]]; then umount $LFS/proc; fi
   if [[ $(mount | grep $LFS/dev/pts) ]]; then umount $LFS/dev/pts; fi
   if [[ $(mount | grep $LFS/dev)     ]]; then umount $LFS/dev; fi
-  echo "Leaving chroot"
+#  echo "Leaving chroot"
   exit $1
 }
 
