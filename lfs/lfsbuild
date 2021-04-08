@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.2.2
+version=0.2.3
 
 # Colours
 DEFAULT="\e[39m"
@@ -212,7 +212,7 @@ case "${1}" in
   *)      # Build and install
     setup ${1}
     checkbuildfile ${1}
-    if [[ ${SBU} != "" ]]; then
+    if [[ ! -z ${SBU} ]]; then
       P=${buildfile##*/}
       P=${P%.*}
       printf "Building $GREEN${P} $DEFAULT\n"
