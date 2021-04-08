@@ -3,6 +3,5 @@ VER="4.1.0"
 HOMEPAGE="https://www.mpfr.org/"
 URL="http://www.mpfr.org/$PKG-$VER/$PKG-$VER.tar.xz"
 MD5="bdd3d5efba9c17da8d83a35ec552baef"
-SBU=""
 
-# Just download source code
+srconly="1" # Just download source code

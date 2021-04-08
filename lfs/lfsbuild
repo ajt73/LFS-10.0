@@ -116,12 +116,12 @@ src_patch() {
 }
 
 src_configure() {
-  printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Configuring $GREEN$PKG-$VER $DEFAULT"
   ./configure ${conf_opts} >> ${buildlog} 2>&1
 }
 
 src_make() {
-  printf "Compiling   $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Compiling   $GREEN$PKG-$VER $DEFAULT"
   make ${make_opts} >> ${buildlog} 2>&1
 }
 
@@ -130,7 +130,7 @@ src_check() {
 }
 
 src_test() {
-  printf "Testing   $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Testing     $GREEN$PKG-$VER $DEFAULT"
   # Allow both make test and make check
   testcommand=${1}
   if [ -z ${testcommand} ]; then testcommand="test"; fi
@@ -138,7 +138,7 @@ src_test() {
 }
 
 src_install() {
-  printf "Installing  $GREEN$PKG-$VER $DEFAULT\n"
+  echo -e "Installing  $GREEN$PKG-$VER $DEFAULT"
   make install ${inst_opts} >> ${buildlog} 2>&1
 }
 
@@ -174,6 +174,7 @@ __help() {
   echo "-s       : Synchronise the local buildfiles with the master buildfiles"
   echo "-v       : Show the version number"
   echo "{pkg}    : Build and install package"
+  # Orange options not yet implemented
 }
 
 ##############
@@ -198,7 +199,10 @@ case "${1}" in
   -s)     # Synchronise
     MASTER="/media/user/011b7a68-5f77-4744-8a84-9023eea502ad/LFS-10.0"
     LFS=/mnt/lfs
-    cp -rup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
+    mkdir -p $LFS/usr/src/{buildscripts,pkg}
+    cp -vrup ${MASTER}/src/* -t $LFS/usr/src
+    cp -vrup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
+    chown -R root:root $LFS/usr/src
     mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
     echo "Updated to $($LFS/usr/bin/lfsbuild -v)"
   ;;
@@ -227,6 +231,8 @@ case "${1}" in
       done
     fi
     if [[ -n ${PKG} ]]; then  # meta packages do not define PKG
+      # Exit if the package is source code only
+      if [[ ! -z ${srconly} ]]; then exit 0; fi
       pushd ${srcdir} > /dev/null
       tarball=${URL##*/}
       buildlog=${logdir}/${PKG}-${VER}

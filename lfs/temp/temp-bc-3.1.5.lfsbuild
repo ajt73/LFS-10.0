@@ -6,19 +6,16 @@ MD5="bd6a6693f68c2ac5963127f82507716f"
 SBU="0.1"
 
 __configure() {
-set -e
   printf "Configuring $GREEN$PKG-$VER $DEFAULT\n"
   PREFIX=$LFS/usr CC=gcc CFLAGS="-std=c99" \
     ./configure.sh --disable-dc -G -O3 >> ${buildlog} 2>&1
 }
 
 __make() {
-set -e
   src_make
 }
 
 __install() {
-set -e
   inst_opts=""
   cp -v bin/bc $LFS/usr/bin >> ${buildlog} 2>&1
 }

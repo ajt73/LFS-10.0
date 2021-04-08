@@ -5,7 +5,11 @@ URL="http://ftp.gnu.org/gnu/${PKG}/${PKG}-${VER}.tar.xz"
 MD5="720c7992861c57cf97d66a2f36d8d1fa"
 PATCH=("http://www.linuxfromscratch.org/patches/lfs/10.0/glibc-2.32-fhs-1.patch")
 PATCHMD5=("9a5997c3452909b1769918c759eff8a2")
+REQUIRE=("tzdata2020a")
 SBU="20"
+# Known test suite failures
+TESTFAILS=("FAIL: io/tst-lchmod"
+           "FAIL: misc/tst-ttyname")
 
 __prepare() {
   src_patch  
@@ -32,7 +36,22 @@ __test() {
     i?86)   ln -sfn $PWD/elf/ld-linux.so.2        /lib ;;
     x86_64) ln -sfn $PWD/elf/ld-linux-x86-64.so.2 /lib ;;
   esac
+  # Disable fail on error
+  set +eo pipefail
   src_check
+  # There are 2 expected FAILS
+  if [ $? -ne 0 ]; then
+    # Count the number of FAILed tests
+    testfails=$(grep " FAIL" ${buildlog}-test)
+    testfails=${testfails%" "*}
+    # Discard known FAILs
+    for line in "${TESTFAILS[@]}"
+    do
+      testfails=$(($testfails-$(grep -c "$line" ${buildlog}-test)))
+    done
+  fi
+  set -eo pipefail
+  return $testfails
 }
 
 __install() {
@@ -43,34 +62,35 @@ __install() {
   cp ../nscd/nscd.conf ${installdir}/etc/nscd.conf
   mkdir -p ${installdir}/var/cache/nscd
   
-  mkdir -p /usr/lib/locale
-  localedef -i POSIX -f UTF-8 C.UTF-8 2> /dev/null || true
-  localedef -i cs_CZ -f UTF-8 cs_CZ.UTF-8
-  localedef -i de_DE -f ISO-8859-1 de_DE
-  localedef -i de_DE@euro -f ISO-8859-15 de_DE@euro
-  localedef -i de_DE -f UTF-8 de_DE.UTF-8
-  localedef -i el_GR -f ISO-8859-7 el_GR
-  localedef -i en_GB -f ISO-8859-1 en_GB
-  localedef -i en_GB -f UTF-8 en_GB.UTF-8
-  localedef -i en_HK -f ISO-8859-1 en_HK
-  localedef -i en_PH -f ISO-8859-1 en_PH
-  localedef -i en_US -f ISO-8859-1 en_US
-  localedef -i en_US -f UTF-8 en_US.UTF-8
-  localedef -i es_MX -f ISO-8859-1 es_MX
-  localedef -i fa_IR -f UTF-8 fa_IR
-  localedef -i fr_FR -f ISO-8859-1 fr_FR
-  localedef -i fr_FR@euro -f ISO-8859-15 fr_FR@euro
-  localedef -i fr_FR -f UTF-8 fr_FR.UTF-8
-  localedef -i it_IT -f ISO-8859-1 it_IT
-  localedef -i it_IT -f UTF-8 it_IT.UTF-8
-  localedef -i ja_JP -f EUC-JP ja_JP
-  localedef -i ja_JP -f SHIFT_JIS ja_JP.SIJS 2> /dev/null || true
-  localedef -i ja_JP -f UTF-8 ja_JP.UTF-8
-  localedef -i ru_RU -f KOI8-R ru_RU.KOI8-R
-  localedef -i ru_RU -f UTF-8 ru_RU.UTF-8
-  localedef -i tr_TR -f UTF-8 tr_TR.UTF-8
-  localedef -i zh_CN -f GB18030 zh_CN.GB18030
-  localedef -i zh_HK -f BIG5-HKSCS zh_HK.BIG5-HKSCS
+  # Configure locales
+  mkdir -p ${installdir}/usr/lib/locale
+  localedef --prefix=${installdir} -i POSIX -f UTF-8 C.UTF-8 2> /dev/null || true
+  localedef --prefix=${installdir} -i cs_CZ -f UTF-8 cs_CZ.UTF-8
+  localedef --prefix=${installdir} -i de_DE -f ISO-8859-1 de_DE
+  localedef --prefix=${installdir} -i de_DE@euro -f ISO-8859-15 de_DE@euro
+  localedef --prefix=${installdir} -i de_DE -f UTF-8 de_DE.UTF-8
+  localedef --prefix=${installdir} -i el_GR -f ISO-8859-7 el_GR
+  localedef --prefix=${installdir} -i en_GB -f ISO-8859-1 en_GB
+  localedef --prefix=${installdir} -i en_GB -f UTF-8 en_GB.UTF-8
+  localedef --prefix=${installdir} -i en_HK -f ISO-8859-1 en_HK
+  localedef --prefix=${installdir} -i en_PH -f ISO-8859-1 en_PH
+  localedef --prefix=${installdir} -i en_US -f ISO-8859-1 en_US
+  localedef --prefix=${installdir} -i en_US -f UTF-8 en_US.UTF-8
+  localedef --prefix=${installdir} -i es_MX -f ISO-8859-1 es_MX
+  localedef --prefix=${installdir} -i fa_IR -f UTF-8 fa_IR
+  localedef --prefix=${installdir} -i fr_FR -f ISO-8859-1 fr_FR
+  localedef --prefix=${installdir} -i fr_FR@euro -f ISO-8859-15 fr_FR@euro
+  localedef --prefix=${installdir} -i fr_FR -f UTF-8 fr_FR.UTF-8
+  localedef --prefix=${installdir} -i it_IT -f ISO-8859-1 it_IT
+  localedef --prefix=${installdir} -i it_IT -f UTF-8 it_IT.UTF-8
+  localedef --prefix=${installdir} -i ja_JP -f EUC-JP ja_JP
+  localedef --prefix=${installdir} -i ja_JP -f SHIFT_JIS ja_JP.SIJS 2> /dev/null || true
+  localedef --prefix=${installdir} -i ja_JP -f UTF-8 ja_JP.UTF-8
+  localedef --prefix=${installdir} -i ru_RU -f KOI8-R ru_RU.KOI8-R
+  localedef --prefix=${installdir} -i ru_RU -f UTF-8 ru_RU.UTF-8
+  localedef --prefix=${installdir} -i tr_TR -f UTF-8 tr_TR.UTF-8
+  localedef --prefix=${installdir} -i zh_CN -f GB18030 zh_CN.GB18030
+  localedef --prefix=${installdir} -i zh_HK -f BIG5-HKSCS zh_HK.BIG5-HKSCS
   
   cat > ${installdir}/etc/nsswitch.conf << "EOF"
 # Begin /etc/nsswitch.conf
@@ -90,6 +110,22 @@ rpc: files
 # End /etc/nsswitch.conf
 EOF
 
+  # Setup Timezone data
+  tar -xf ../../tzdata2020a.tar.gz
+  ZONEINFO=${installdir}/usr/share/zoneinfo
+  mkdir -p $ZONEINFO/{posix,right}
+  for tz in etcetera southamerica northamerica europe africa antarctica  \
+            asia australasia backward pacificnew systemv; do
+      zic -L /dev/null   -d $ZONEINFO       ${tz}
+      zic -L /dev/null   -d $ZONEINFO/posix ${tz}
+      zic -L leapseconds -d $ZONEINFO/right ${tz}
+  done
+  cp zone.tab zone1970.tab iso3166.tab $ZONEINFO
+  zic -d $ZONEINFO -p America/New_York
+  unset ZONEINFO
+  ln -sfv /usr/share/zoneinfo/Europe/London ${installdir}/etc/localtime
+
+  # Configure the dynamic loader
   cat > ${installdir}/etc/ld.so.conf << "EOF"
 # Begin /etc/ld.so.conf
 /usr/local/lib

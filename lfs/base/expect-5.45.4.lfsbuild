@@ -19,6 +19,7 @@ __make() {
 
 __test() {
   src_test
+  echo
 }
 
 __install() {
