@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.2.4
+version=0.2.5
 
 # Colours
 DEFAULT="\e[39m"
@@ -245,15 +245,14 @@ case "${1}" in
       done
     fi
     if [[ -n ${PKG} ]]; then  # meta packages do not define PKG
-      # Exit if the package is source code only
-      if [[ ! -z ${srconly} ]]; then exit 0; fi
-      pushd ${srcdir} > /dev/null
       tarball=${URL##*/}
+      src_fetch
+      if [[ -z ${srconly} ]]; then exit 0; fi
+      pushd ${srcdir} > /dev/null
       buildlog=${logdir}/${PKG}-${VER}
       if [ -f ${buildlog} ]; then rm ${buildlog}; fi
       date > ${buildlog}     # Log the long date
       date +%s >> ${buildlog} # Log the date as seconds
-      if [[ ${URL} != "" ]]; then src_fetch; fi
       if [[ ${tarball} != "" ]]; then src_unpack; fi
       if [[ $(declare -F __prepare) ]]; then __prepare; fi
       if [[ $(declare -F __configure) ]]; then __configure; fi
