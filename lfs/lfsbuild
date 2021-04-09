@@ -11,7 +11,7 @@
 #set -x
 set -eo pipefail
 
-version=0.2.3
+version=0.2.4
 
 # Colours
 DEFAULT="\e[39m"
@@ -104,10 +104,12 @@ src_patch() {
       echo -e "Downloading $GREEN$srcpatch $DEFAULT"
       wget -q ${srcpatch}
     fi
-    md5=$(md5sum ${srcdir}/${srcpatch})
-    if [ ${md5%% *} != ${PATCHMD5[p]} ]; then
-      echo "Error: Bad checksum for ${srcpatch}"
-      exit 1
+    if [[ ! -z ${PATCHMD5[p]} ]]; then
+      md5=$(md5sum ${srcdir}/${srcpatch})
+      if [ ${md5%% *} != ${PATCHMD5[p]} ]; then
+        echo "Error: Bad checksum for ${srcpatch}"
+        exit 1
+      fi
     fi
     patch -Np1 -i ${srcdir}/${srcpatch} >> ${buildlog} 2>&1
     ((p=p+1))
@@ -200,14 +202,26 @@ case "${1}" in
     MASTER="/media/user/011b7a68-5f77-4744-8a84-9023eea502ad/LFS-10.0"
     LFS=/mnt/lfs
     mkdir -p $LFS/usr/src/{buildscripts,pkg}
-    cp -vrup ${MASTER}/src/* -t $LFS/usr/src
-    cp -vrup ${MASTER}/lfs/* -t $LFS/usr/src/buildscripts
+    cp -rup ${MASTER}/src/* -t $LFS/usr/src
+    for file in $(find ${MASTER}/lfs/ -type f); do
+      filename=${file##*${MASTER}/lfs/}
+      if [ ${filename} = "lfsbuild" ]; then
+        if [ ${file} -nt $LFS/usr/bin/${filename} ]; then
+          cp ${file} $LFS/usr/bin/          
+          chown root:root $LFS/usr/bin/lfsbuild
+          $LFS/usr/bin/lfsbuild -v
+        fi
+      elif [ ${file} -nt $LFS/usr/src/buildscripts/${filename} ]; then
+        echo ${filename}
+        filepath=$LFS/usr/src/buildscripts/${filename%%/*}
+        if [[ ! -d ${filepath} ]]; then mkdir -p ${filepath}; fi
+        cp ${file} ${filepath}
+      fi
+    done
     chown -R root:root $LFS/usr/src
-    mv $LFS/usr/src/buildscripts/lfsbuild $LFS/usr/bin/
-    echo "Updated to $($LFS/usr/bin/lfsbuild -v)"
   ;;
   -v)     # Version
-    echo "$version"
+    echo "lfsbuild-$version"
   ;;
   *)      # Build and install
     setup ${1}
