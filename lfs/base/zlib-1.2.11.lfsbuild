@@ -19,6 +19,7 @@ __test() {
 
 __install() {
   src_install
-  mv -v /usr/lib/libz.so.* ${installdir}/lib
-  ln -sfv ../../lib/$(readlink /usr/lib/libz.so) ${installdir}/usr/lib/libz.so
+  mkdir ${installdir}/lib
+  mv ${installdir}/usr/lib/libz.so.* ${installdir}/lib
+  ln -sf ../../lib/$(readlink /usr/lib/libz.so) ${installdir}/usr/lib/libz.so
 }
