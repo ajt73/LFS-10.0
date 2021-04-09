@@ -1,0 +1,26 @@
+PKG="acl"
+VER="2.2.53"
+HOMEPAGE="https://savannah.nongnu.org/projects/$PKG"
+URL="http://download.savannah.gnu.org/releases/$PKG/$PKG-$VER.tar.gz"
+MD5="007aabf1dbb550bcddde52a244cd1070"
+SBU="0.1"
+
+__configure() {
+  conf_opts="--prefix=/usr         \
+             --bindir=/bin         \
+             --disable-static      \
+             --libexecdir=/usr/lib \
+             --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+  mv ${installdir}/usr/lib/libacl.so.* ${installdir}/lib
+  ln -sf ../../lib/$(readlink /usr/lib/libacl.so) ${installdir}/usr/lib/libacl.so
+
+}

@@ -1,0 +1,26 @@
+PKG="libcap"
+VER="2.42"
+HOMEPAGE="https://sites.google.com/site/fullycapable/"
+URL="https://www.kernel.org/pub/linux/libs/security/linux-privs/libcap2/$PKG-$VER.tar.xz"
+MD5="f22cd619e04ae7b88a6a0c109b9523eb"
+SBU="0.1"
+
+__make() {
+  sed -i '/install -m.*STACAPLIBNAME/d' libcap/Makefile
+  make_opts="lib=lib"
+  src_make
+}
+
+__test() {
+  src_test
+}
+
+__install() {
+  inst_opts="$inst_opts lib=lib PKGCONFIGDIR=${installdir}/usr/lib/pkgconfig"
+  src_install
+  mkdir -p ${installdir}/usr/lib
+  chmod 755 ${installdir}/lib/libcap.so.2.42
+  mv ${installdir}/lib/libpsx.a ${installdir}/usr/lib
+  rm ${installdir}/lib/libcap.so
+  ln -sf ../../lib/libcap.so.2 ${installdir}/usr/lib/libcap.so
+}
