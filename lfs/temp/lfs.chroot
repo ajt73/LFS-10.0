@@ -1,13 +1,7 @@
 #!/bin/bash
 #
 set -e
-trap '_err $? $LINENO' ERR
-trap '_exit $?' EXIT
-
-_err() {
-  echo "Error $1 : Line $2"
-  exit $1
-}
+trap '_exit $?' ERR EXIT
 
 _exit() {
   # Unmount temporary filesystems
