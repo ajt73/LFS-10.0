@@ -1,0 +1,28 @@
+PKG="mpfr"
+VER="4.1.0"
+HOMEPAGE="https://www.mpfr.org/"
+URL="http://www.mpfr.org/$PKG-$VER/$PKG-$VER.tar.xz"
+MD5="bdd3d5efba9c17da8d83a35ec552baef"
+SBU="0.9"
+
+__configure() {
+  conf_opts="--prefix=/usr        \
+             --disable-static     \
+             --enable-thread-safe \
+             --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+  make html >> ${buildlog} 2>&1
+}
+
+__test() {
+  src_check
+}
+
+__install() {
+  src_install
+  make DESTDIR=${installdir} install-html >> ${buildlog} 2>&1
+}

@@ -1,0 +1,30 @@
+PKG="attr"
+VER="2.4.48"
+HOMEPAGE="https://savannah.nongnu.org/projects/$PKG"
+URL="http://download.savannah.gnu.org/releases/$PKG/$PKG-$VER.tar.gz"
+MD5="bc1e5cb5c96d99b24886f1f527d3bb3d"
+SBU="0.1"
+
+__configure() {
+  conf_opts="--prefix=/usr     \
+            --bindir=/bin     \
+            --disable-static  \
+            --sysconfdir=/etc \
+            --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__test() {
+  src_check
+}
+
+__install() {
+  src_install
+  mv ${installdir}/usr/lib/libattr.so.* ${installdir}/lib
+  ln -sf ../../lib/$(readlink /usr/lib/libattr.so) ${installdir}/usr/lib/libattr.so
+
+}

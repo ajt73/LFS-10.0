@@ -1,0 +1,27 @@
+PKG="mpc"
+VER="1.1.0"
+HOMEPAGE="http://www.multiprecision.org/"
+URL="https://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="4125404e41e482ec68282a2e687f6c73"
+SBU="0.3"
+
+__configure() {
+  conf_opts="--prefix=/usr        \
+             --disable-static     \
+             --docdir=/usr/share/doc/$PKG-$VER"
+  src_configure
+}
+
+__make() {
+  src_make
+  make html >> ${buildlog} 2>&1
+}
+
+__test() {
+  src_check
+}
+
+__install() {
+  src_install
+  make DESTDIR=${installdir} install-html >> ${buildlog} 2>&1
+}
