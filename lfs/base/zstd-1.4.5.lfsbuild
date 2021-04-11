@@ -10,8 +10,10 @@ __make() {
  }
 
 __install() {
+  inst_opts="$inst_opts PREFIX=/usr"
   src_install
-  rm -v ${installdir}/usr/lib/libzstd.a
-  mv -v /usr/lib/libzstd.so.* ${installdir}/lib
-  ln -sfv ../../lib/$(readlink /usr/lib/libzstd.so) ${installdir}/usr/lib/libzstd.so
+  mkdir -p ${installdir}/lib
+  rm ${installdir}/usr/lib/libzstd.a
+  mv ${installdir}/usr/lib/libzstd.so.* ${installdir}/lib
+  ln -sf ../../lib/$(readlink /usr/lib/libzstd.so) ${installdir}/usr/lib/libzstd.so
 }

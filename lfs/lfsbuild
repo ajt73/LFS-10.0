@@ -11,7 +11,14 @@
 #set -x
 set -eo pipefail
 
-version=0.2.5
+version=0.2.6
+
+trap '_err $? $LINENO' ERR
+
+_err() {
+  echo "Error $1 : Line $2"
+  exit $1
+}
 
 # Colours
 DEFAULT="\e[39m"
@@ -49,6 +56,7 @@ setup() {
     SBUref=$(grep SBU= ${lfsconfig})
     SBUref=${SBUref#*=}
   fi
+  unset SBU
 }
 
 checkbuildfile() {
@@ -226,18 +234,6 @@ case "${1}" in
   *)      # Build and install
     setup ${1}
     checkbuildfile ${1}
-    if [[ ! -z ${SBU} ]]; then
-      P=${buildfile##*/}
-      P=${P%.*}
-      printf "Building $GREEN${P} $DEFAULT\n"
-      # Check for bc to allow calculation of build time
-      if [[ $(bc -v 2>/dev/null) ]]; then
-        buildsec=00$(bc <<< "scale=0;${SBUref}*${SBU}%60/1")
-        buildmin=00$(bc <<< ${SBUref}*${SBU}/60)
-        buildtime="${buildmin:(-2)}:${buildsec:(-2)}"
-        printf "Estimated Build Time: $CYAN${buildtime} $DEFAULT\n"
-      fi
-    fi
     if [ -n ${REQUIRE} ]; then
     # Resolve dependancies
       for dep in ${REQUIRE[@]}; do
@@ -245,10 +241,22 @@ case "${1}" in
       done
     fi
     if [[ -n ${PKG} ]]; then  # meta packages do not define PKG
+      P=${buildfile##*/}
+      P=${P%.*}
+      printf "Building $GREEN${P} $DEFAULT\n"
+      if [[ -n ${SBU} ]]; then
+        # Check for bc to allow calculation of build time
+        if [[ $(bc -v 2>/dev/null) ]]; then
+          buildsec=00$(bc <<< "scale=0;${SBUref}*${SBU}%60/1")
+          buildmin=00$(bc <<< ${SBUref}*${SBU}/60)
+          buildtime="${buildmin:(-2)}:${buildsec:(-2)}"
+          printf "Estimated Build Time: $CYAN${buildtime} $DEFAULT\n"
+        fi
+      fi
+      pushd ${srcdir} > /dev/null
       tarball=${URL##*/}
       src_fetch
-      if [[ -z ${srconly} ]]; then exit 0; fi
-      pushd ${srcdir} > /dev/null
+      if [[ -n ${srconly} ]]; then exit 0; fi
       buildlog=${logdir}/${PKG}-${VER}
       if [ -f ${buildlog} ]; then rm ${buildlog}; fi
       date > ${buildlog}     # Log the long date

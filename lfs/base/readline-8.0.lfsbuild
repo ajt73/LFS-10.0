@@ -19,15 +19,16 @@ __configure() {
 }
 
 __make() {
-  make_opts="SHLIB_LIBS="-lncursesw"
+  make_opts="SHLIB_LIBS='-lncursesw'"
   src_make
 }
 
 __install() {
-  inst_opts="$inst_opts SHLIB_LIBS="-lncursesw""
+  inst_opts="$inst_opts SHLIB_LIBS='-lncursesw'"
   src_install
-  mv -v /usr/lib/lib{readline,history}.so.* ${installdir}/lib
-  chmod -v u+w ${installdir}/lib/lib{readline,history}.so.*
-  ln -sfv ../../lib/$(readlink /usr/lib/libreadline.so) ${installdir}/usr/lib/libreadline.so
-  ln -sfv ../../lib/$(readlink /usr/lib/libhistory.so ) ${installdir}/usr/lib/libhistory.so
+  mkdir -p ${installdir}/lib
+  mv ${installdir}/usr/lib/lib{readline,history}.so.* ${installdir}/lib
+  chmod u+w ${installdir}/lib/lib{readline,history}.so.*
+  ln -sf ../../lib/$(readlink /usr/lib/libreadline.so) ${installdir}/usr/lib/libreadline.so
+  ln -sf ../../lib/$(readlink /usr/lib/libhistory.so) ${installdir}/usr/lib/libhistory.so
 }

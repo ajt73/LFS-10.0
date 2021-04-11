@@ -20,5 +20,5 @@ __test() {
 
 __install() {
   src_install
-  ln -sv flex ${installdir}/usr/bin/flex
+  ln -s flex ${installdir}/usr/bin/lex
 }
