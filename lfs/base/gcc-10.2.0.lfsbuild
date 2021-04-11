@@ -1,0 +1,86 @@
+PKG="gcc"
+VER="10.2.0"
+HOMEPAGE="https://gcc.gnu.org/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER/$PKG-$VER.tar.xz"
+MD5="e9fd9b1789155ad09bcf3ae747596b50"
+REQUIRE=("cross-mpfr-4.1.0" "cross-gmp-6.2.0" "cross-mpc-1.1.0")
+SBU="102"
+
+__prepare() {
+  case $(uname -m) in
+  x86_64)
+    sed -e '/m64=/s/lib64/lib/' \
+        -i.orig gcc/config/i386/t-linux64
+    ;;
+  esac
+  
+  mkdir build
+  cd build
+}
+
+__configure() {
+  echo -e "Configuring $GREEN$PKG-$VER $DEFAULT"
+  ../configure --prefix=/usr            \
+               LD=ld                    \
+               --enable-languages=c,c++ \
+               --disable-multilib       \
+               --disable-bootstrap      \
+               --with-system-zlib
+}
+
+__make() {
+  make_opts="-j1"
+  src_make
+}
+
+__test() {
+  ulimit -s 32768
+  chown -R tester . 
+  su tester -c "PATH=$PATH make -k check" >> ${buildlog}-test 2>&1
+  ../contrib/test_summary | grep -A7 Summ
+  exit 99
+}
+
+__install() {
+  src_install
+  mkdir -p ${installdir}/{lib,usr/lib/bfd-plugins}
+  rm -rf ${installdir}/usr/lib/gcc/$(gcc -dumpmachine)/10.2.0/include-fixed/bits/
+  chown -R root:root ${installdir}/usr/lib/gcc/*linux-gnu/10.2.0/include{,-fixed}
+  ln -s ../usr/bin/cpp /lib
+  install -dm755 ${installdir}/usr/lib/bfd-plugins
+  ln -sf ../../libexec/gcc/$(gcc -dumpmachine)/10.2.0/liblto_plugin.so \
+        ${installdir}/usr/lib/bfd-plugins/
+  mkdir -p ${installdir}/usr/share/gdb/auto-load/usr/lib
+  mv ${installdir}/usr/lib/*gdb.py ${install-dir}/usr/share/gdb/auto-load/usr/lib
+}
+
+__postconfig() {
+  # Sanity check
+  echo 'int main(){}' > dummy.c
+  cc dummy.c -v -Wl,--verbose &> dummy.log
+  case $(uname -m) in
+    x86_64)
+      interpreter="/lib64/ld-linux-x86-64.so.2"
+    ;;
+    *)
+      interpreter="/lib/ld-linux.so.2"
+    ;;
+  esac
+  if [ $(readelf -l a.out | grep -c ${interpreter}) -eq 0 ]; then
+    echo "Error in toolchain!"
+    readelf -l a.out | grep /lib
+    exit 1
+  fi
+  if [ $(grep -co '/usr/lib.*/crt[1in].*succeeded' dummy.log) -ne 3 ]; then
+    echo "Error in toolchain!"
+    grep -co '/usr/lib.*/crt[1in].*succeeded' dummy.log
+    exit 1  
+  fi
+grep -B4 '^ /usr/include' dummy.log
+grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'
+grep "/lib.*/libc.so.6 " dummy.log
+grep found dummy.log
+  rm dummy.c a.out dummy.log
+}
+
+
