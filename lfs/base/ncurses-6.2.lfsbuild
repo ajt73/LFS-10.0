@@ -1,0 +1,42 @@
+PKG="ncurses"
+VER="6.2"
+HOMEPAGE="http://www.gnu.org/software/ncurses/"
+URL="http://ftp.gnu.org/gnu/$PKG/$PKG-$VER.tar.gz"
+MD5="e812da327b1c2214ac1aed440ea3ae8d"
+SBU="0.7"
+
+__prepare() {
+  sed -i '/LIBTOOL_INSTALL/d' c++/Makefile.in
+}
+
+__configure() {
+  conf_opts="--prefix=/usr           \
+            --mandir=/usr/share/man \
+            --with-shared           \
+            --without-debug         \
+            --without-normal        \
+            --enable-pc-files       \
+            --enable-widec"
+  src_configure
+}
+
+__make() {
+  src_make
+}
+
+__install() {
+  src_install
+  makedir -p ${installdir}/{lib,usr/lib/pkgconfig}
+  mv ${installdir}/usr/lib/libncursesw.so.6* ${installdir}/lib
+  ln -sf ../../lib/$(readlink /usr/lib/libncursesw.so) ${installdir}/usr/lib/libncursesw.so
+  for lib in ncurses form panel menu ; do
+    rm -f ${installdir}/usr/lib/lib${lib}.so
+    echo "INPUT(-l${lib}w)" > ${installdir}/usr/lib/lib${lib}.so
+    ln -sf ${lib}w.pc ${installdir}/usr/lib/pkgconfig/${lib}.pc
+  done
+  rm -f ${installdir}/usr/lib/libcursesw.so
+  echo "INPUT(-lncursesw)" > ${installdir}/usr/lib/libcursesw.so
+  ln -sf libncurses.so ${installdir}/usr/lib/libcurses.so
+  mkdir ${installdir}/usr/share/doc/$PKG-$VER
+  cp -R doc/* ${installdir}/usr/share/doc/$PKG-$VER
+}
